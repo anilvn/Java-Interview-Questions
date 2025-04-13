@@ -255,3 +255,48 @@ optionalEmployee.ifPresent(emp -> {
         // Logic for handling employee email
     });
 });
+```
+
+
+## Example: Handling Null Employee DataRetrieving a Customer by Email
+```java
+import java.util.List;
+import java.util.Optional;
+
+class Customer {
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Customer(String email) {
+        this.email = email;
+    }
+}
+
+class EkartDataBase {
+    private static List<Customer> customers = List.of(new Customer("test@test.com"));
+
+    public static List<Customer> getALL() {
+        return customers;
+    }
+}
+
+public static Optional<Customer> getCustomerByEmailId(String email) {
+    return EkartDataBase.getALL().stream()
+                       .filter(customer -> customer.getEmail().equals(email))
+                       .findAny();
+}
+
+// Usage
+Optional<Customer> customer = getCustomerByEmailId("test@test.com");
+customer.ifPresentOrElse(
+    c -> System.out.println("Customer found: " + c.getEmail()),
+    () -> System.out.println("No customer found with that email")
+);
+
+// Or throw an exception if not found
+Customer foundCustomer = getCustomerByEmailId("invalid@test.com")
+                           .orElseThrow(() -> new RuntimeException("No customer present with this email id"));
+```
