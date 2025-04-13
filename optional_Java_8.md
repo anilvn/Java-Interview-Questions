@@ -258,7 +258,7 @@ optionalEmployee.ifPresent(emp -> {
 ```
 
 
-## Example: Handling Null Employee DataRetrieving a Customer by Email
+### Example: Retrieving a Customer by Email
 ```java
 import java.util.List;
 import java.util.Optional;
@@ -299,4 +299,44 @@ customer.ifPresentOrElse(
 // Or throw an exception if not found
 Customer foundCustomer = getCustomerByEmailId("invalid@test.com")
                            .orElseThrow(() -> new RuntimeException("No customer present with this email id"));
+```
+
+### Example: Spring REST Controller
+```java
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
+
+@RestController
+public class EmployeeController {
+
+    private final EmployeeRepository repo; // Assume this is your repository
+
+    public EmployeeController(EmployeeRepository repo) {
+        this.repo = repo;
+    }
+
+    @GetMapping("/employees/{id}")
+    public ResponseEntity<?> getEmployeeById(@PathVariable Long id) {
+        Optional<Employee> employee = repo.findById(id); // Assuming findById returns Optional
+
+        return employee.map(e -> ResponseEntity.ok(e))
+                       .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                           .body("Employee with ID " + id + " not found"));
+    }
+
+    @GetMapping("/employees/{id}/name")
+    public ResponseEntity<?> getEmployeeNameById(@PathVariable Long id) {
+        Optional<Employee> employee = repo.findById(id);
+
+        return employee.flatMap(e -> Optional.ofNullable(e.getFirstName()))
+                       .map(name -> ResponseEntity.ok(name.toUpperCase()))
+                       .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                           .body("Employee with ID " + id + " not found, or name is null"));
+    }
+}
 ```
