@@ -2,6 +2,18 @@
 
 This document provides coding examples and descriptions for various core and advanced Java concepts.
 
+---
+### Additional Resources
+
+If you found this guide helpful, you might also be interested in my other Spring Framework resources:
+- [Core Java & Java-8 Interview Questions](https://github.com/anilvn/Java-Interview-Questions/tree/main)
+- [Spring Boot Interview Questions](https://github.com/anilvn/spring-boot-interview-questions/tree/main)
+- [Microservices with Spring Cloud Tutorials](https://javatechonline.com/microservices-tutorial/)
+
+Feel free to star and fork these repositories if you find them useful!
+
+---
+
 ## Object Creation in Java
 
 ### Ways to Create Objects
@@ -353,7 +365,7 @@ Java provides various streams for handling byte and character data:
 #### Byte Streams (for binary data):
 
 * `FileInputStream` (FIS): Reads bytes from a file.
-* `FileOutputStream` (FOS): Writes bytes to a file.
+* `FileOutputStream` (FOAS): Writes bytes to a file.
 * `ByteArrayInputStream`: Reads bytes from a byte array.
 * `ByteArrayOutputStream`: Writes bytes to a byte array.
 * `DataInputStream` (DIS): Reads primitive data types and strings in a machine-independent way.

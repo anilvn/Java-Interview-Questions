@@ -5,6 +5,16 @@
 Java Streams, introduced in Java 8, provide a powerful and declarative way to process sequences of elements. They allow for functional-style operations on collections, enabling concise and potentially parallelized data manipulation. Streams support two main types of operations: **Intermediate** and **Terminal**.
 
 ---
+### Additional Resources
+
+If you found this guide helpful, you might also be interested in my other Spring Framework resources:
+- [Core Java & Java-8 Interview Questions](https://github.com/anilvn/Java-Interview-Questions/tree/main)
+- [Spring Boot Interview Questions](https://github.com/anilvn/spring-boot-interview-questions/tree/main)
+- [Microservices with Spring Cloud Tutorials](https://javatechonline.com/microservices-tutorial/)
+
+Feel free to star and fork these repositories if you find them useful!
+
+---
 
 ## ⚙️ Intermediate Operations
 

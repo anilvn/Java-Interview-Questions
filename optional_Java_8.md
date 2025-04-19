@@ -4,6 +4,18 @@
 
 As Java programmers, we often encounter `NullPointerException`. Java 8 introduced the `Optional` class in the `java.util` package to help avoid null checks and these exceptions. `Optional` is a container object that may or may not contain a non-null value. It essentially wraps an object to indicate the possible absence of a value.
 
+---
+### Additional Resources
+
+If you found this guide helpful, you might also be interested in my other Spring Framework resources:
+- [Core Java & Java-8 Interview Questions](https://github.com/anilvn/Java-Interview-Questions/tree/main)
+- [Spring Boot Interview Questions](https://github.com/anilvn/spring-boot-interview-questions/tree/main)
+- [Microservices with Spring Cloud Tutorials](https://javatechonline.com/microservices-tutorial/)
+
+Feel free to star and fork these repositories if you find them useful!
+
+---
+
 ## Why Use Optional?
 
 * **Avoids NullPointerExceptions:** Enforces explicit handling of null values, reducing the risk of runtime errors.

@@ -4,6 +4,18 @@
 
 This section demonstrates various stream operations applied specifically to a list of `Employee` objects, covering common data manipulation tasks.
 
+---
+### Additional Resources
+
+If you found this guide helpful, you might also be interested in my other Spring Framework resources:
+- [Core Java & Java-8 Interview Questions](https://github.com/anilvn/Java-Interview-Questions/tree/main)
+- [Spring Boot Interview Questions](https://github.com/anilvn/spring-boot-interview-questions/tree/main)
+- [Microservices with Spring Cloud Tutorials](https://javatechonline.com/microservices-tutorial/)
+
+Feel free to star and fork these repositories if you find them useful!
+
+---
+
 ### Employee Class Definition
 
 * _First, let's define the `Employee` class used in these examples._
