@@ -12,18 +12,19 @@
 | 5 | [How to design a good key for HashMap](#how-to-design-a-good-key-for-hashmap) |
 | **HashMap Variants** | |
 | 6 | [What is LinkedHashMap in Java](#what-is-linkedhashmap-in-java) |
-| 7 | [How do WeakHashMap work](#how-do-weakhashmap-work) |
-| 8 | [What is EnumMap in Java](#what-is-enummap-in-java) |
-| 9 | [What is IdentityHashMap and when to use it](#what-is-identityhashmap-and-when-to-use-it) |
+| 7 | [What is WeakHashMap?](#what-is-weakhashmap) |
+| 8 | [How do WeakHashMap works?](#how-do-weakhashmap-works) |
+| 9 | [What is EnumMap in Java](#what-is-enummap-in-java) |
+| 10 | [What is IdentityHashMap and when to use it](#what-is-identityhashmap-and-when-to-use-it) |
 | **Concurrent Maps** | |
-| 10 | [Why is ConcurrentHashMap faster than Hashtable in Java](#why-is-concurrenthashmap-faster-than-hashtable-in-java) |
-| 11 | [How does ConcurrentHashMap work internally](#how-does-concurrenthashmap-work-internally) |
+| 11 | [Why is ConcurrentHashMap faster than Hashtable in Java](#why-is-concurrenthashmap-faster-than-hashtable-in-java) |
+| 12 | [How does ConcurrentHashMap work internally](#how-does-concurrenthashmap-work-internally) |
 | **Comparisons** | |
-| 12 | [What are the differences between HashMap and HashSet](#what-are-the-differences-between-hashmap-and-hashset) |
+| 13 | [What are the differences between HashMap and HashSet](#what-are-the-differences-between-hashmap-and-hashset) |
 | **Performance and Best Practices** | |
-| 13 | [What are the time complexities of HashMap operations](#what-are-the-time-complexities-of-hashmap-operations) |
-| 14 | [How to synchronize HashMap in Java](#how-to-synchronize-hashmap-in-java) |
-| 15 | [Common HashMap interview coding problems](#common-hashmap-interview-coding-problems) |
+| 14 | [What are the time complexities of HashMap operations](#what-are-the-time-complexities-of-hashmap-operations) |
+| 15 | [How to synchronize HashMap in Java](#how-to-synchronize-hashmap-in-java) |
+| 16 | [Common HashMap interview coding problems](#common-hashmap-interview-coding-problems) |
 
 ## How HashMap works in Java
 
@@ -494,130 +495,443 @@ System.out.println(cache); // {C=Value C, A=Value A, D=Value D} (B was removed)
 
 [Back to Top](#table-of-contents)
 
-## How do WeakHashMap work
 
-WeakHashMap is a specialized implementation of the Map interface that uses weak references for its keys. This unique characteristic allows entries to be automatically removed when their keys are no longer referenced elsewhere in the program.
+## What is WeakHashMap?
 
-### Key Concepts
+`WeakHashMap` is a specialized `Map` implementation in Java that uses **weak references** for its keys. This unique characteristic makes it particularly useful for specific memory management scenarios.
 
-* **Weak References**: References that do not prevent garbage collection of the referenced object
-* **Automatic Cleanup**: Entries with keys that have been garbage collected are automatically removed
-* **Garbage Collection Dependent**: Behavior depends on JVM garbage collection timing
+* **Definition**: `WeakHashMap` is an implementation of the `Map` interface that stores weak references to its keys. When a key is no longer strongly referenced anywhere else in the program, it becomes eligible for garbage collection.
 
-### How WeakHashMap Works Internally
+* **Key features**:
+  * Entries are automatically removed when keys are no longer in use elsewhere in the program
+  * Uses `equals()` and `hashCode()` methods for comparing keys
+  * Does not allow null keys but permits null values
+  * Not synchronized by default
 
-1. **Reference Types**:
-   * Keys are stored as **WeakReferences**
-   * Values are stored as strong references
-   
-2. **Garbage Collection Process**:
-   * When a key object has no strong references elsewhere in the program, it becomes eligible for garbage collection
-   * After garbage collection, the JVM notifies the Reference queue associated with the WeakHashMap
-   * The WeakHashMap checks this queue during operations and removes entries whose keys have been garbage collected
+* **Basic usage example**:
 
-3. **Internal Structure**:
-   * Similar to HashMap but uses Entry objects that extend WeakReference
-   * Maintains a ReferenceQueue for tracking garbage-collected keys
+  ```java
+  import java.util.WeakHashMap;
+  import java.util.Map;
 
-```java
-// Simplified representation of the internal structure
-public class WeakHashMap<K, V> extends AbstractMap<K, V> implements Map<K, V> {
-    // Entry extends WeakReference and implements Map.Entry
-    private static class Entry<K, V> extends WeakReference<Object> implements Map.Entry<K, V> {
-        V value;
-        final int hash;
-        Entry<K, V> next;
-        
-        // Constructor and methods...
-    }
-    
-    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
-    // Other fields and methods...
-    
-    // Method that expunges stale entries
-    private void expungeStaleEntries() {
-        // Process reference queue and remove entries whose keys were GC'd
-    }
-}
-```
+  public class WeakHashMapExample {
+      public static void main(String[] args) {
+          // Create a WeakHashMap
+          Map<Key, String> weakMap = new WeakHashMap<>();
+          
+          // Create a key that will persist
+          Key persistentKey = new Key("Persistent");
+          
+          // Create a block to limit scope of tempKey
+          {
+              // This key will be eligible for GC after this block
+              Key tempKey = new Key("Temporary");
+              
+              // Add entries to the map
+              weakMap.put(persistentKey, "I will stay");
+              weakMap.put(tempKey, "I will disappear");
+              
+              System.out.println("Map size: " + weakMap.size()); // Output: 2
+              System.out.println("Map contents: " + weakMap);
+          }
+          
+          // Suggest garbage collection (not guaranteed to run)
+          System.gc();
+          System.runFinalization();
+          
+          // Check map after GC
+          System.out.println("Map size after GC: " + weakMap.size()); // May be 1
+          System.out.println("Map contents after GC: " + weakMap);
+      }
+      
+      static class Key {
+          private String id;
+          
+          public Key(String id) {
+              this.id = id;
+          }
+          
+          @Override
+          public String toString() {
+              return "Key[" + id + "]";
+          }
+          
+          @Override
+          public boolean equals(Object obj) {
+              if (this == obj) return true;
+              if (obj == null || getClass() != obj.getClass()) return false;
+              Key key = (Key) obj;
+              return id.equals(key.id);
+          }
+          
+          @Override
+          public int hashCode() {
+              return id.hashCode();
+          }
+          
+          @Override
+          protected void finalize() {
+              System.out.println("Finalizing Key: " + id);
+          }
+      }
+  }
+  ```
 
-### Usage Example
+* **Common applications**:
+  * **Cache implementation**: Where you want entries to be automatically removed when keys are no longer used
+  * **Associating metadata with objects**: When you want to attach additional information to objects without preventing their garbage collection
+  * **Listener/observer management**: To avoid memory leaks when listeners are no longer active
+
+* **Comparison with regular HashMap**:
+
+  | Aspect | HashMap | WeakHashMap |
+  |--------|---------|-------------|
+  | Key References | Strong | Weak |
+  | Memory Management | Must be manually cleared | Automatic cleanup |
+  | Performance | Generally faster | Slightly slower due to reference management |
+  | Thread Safety | Not thread-safe | Not thread-safe |
+  | Use Case | General purpose | Special memory management scenarios |
+
+* **Caveats and considerations**:
+  * Results of garbage collection are non-deterministic
+  * Only keys are weak references (values are held by strong references)
+  * If a value holds a strong reference back to its key, the key won't be garbage collected
+  * Thread-safety must be handled externally if needed (e.g., using `Collections.synchronizedMap()`)
+
+**Example of a memory-sensitive cache implementation**:
 
 ```java
 import java.util.WeakHashMap;
+import java.util.Map;
 
-public class WeakHashMapDemo {
-    public static void main(String[] args) {
-        // Create a WeakHashMap
-        WeakHashMap<Key, String> weakMap = new WeakHashMap<>();
+public class WeakReferenceCacheExample {
+    // Cache that automatically cleans up when keys are no longer used
+    private static final Map<CacheKey, ExpensiveResource> resourceCache = new WeakHashMap<>();
+    
+    public static ExpensiveResource getResource(String id) {
+        CacheKey key = new CacheKey(id);
         
-        // Create a key that we'll maintain a strong reference to
-        Key strongKey = new Key("StrongKey");
+        // Check if resource exists in cache
+        ExpensiveResource resource = resourceCache.get(key);
         
-        // Create a key that will have no other strong references
-        Key weakKey = new Key("WeakKey");
+        if (resource == null) {
+            // Create new resource if not in cache
+            resource = new ExpensiveResource(id);
+            resourceCache.put(key, resource);
+            System.out.println("Created new resource: " + id);
+        } else {
+            System.out.println("Retrieved from cache: " + id);
+        }
         
-        // Add both to the map
-        weakMap.put(strongKey, "Strong Value");
-        weakMap.put(weakKey, "Weak Value");
-        
-        // Check initial state
-        System.out.println("Initial map size: " + weakMap.size());  // Output: Initial map size: 2
-        System.out.println("Map contains: " + weakMap);  // Contains both entries
-        
-        // Remove the strong reference to weakKey
-        weakKey = null;
-        
-        // Force garbage collection (though this doesn't guarantee immediate collection)
-        System.gc();
-        
-        // Sleep a bit to give GC time to work
-        try { Thread.sleep(500); } catch (InterruptedException e) {}
-        
-        // Check final state - weakKey entry should be gone
-        System.out.println("Final map size: " + weakMap.size());  // Output: Final map size: 1
-        System.out.println("Map contains: " + weakMap);  // Contains only strongKey entry
+        return resource;
     }
     
-    static class Key {
+    static class CacheKey {
         private String id;
         
-        public Key(String id) {
+        public CacheKey(String id) {
             this.id = id;
         }
         
         @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof CacheKey)) return false;
+            return id.equals(((CacheKey)obj).id);
+        }
+        
+        @Override
+        public int hashCode() {
+            return id.hashCode();
+        }
+    }
+    
+    static class ExpensiveResource {
+        private String data;
+        
+        public ExpensiveResource(String id) {
+            // Simulate expensive resource creation
+            this.data = "Data for " + id;
+            // In real world: load file, connect to network, etc.
+        }
+        
+        @Override
         public String toString() {
-            return "Key[" + id + "]";
+            return data;
         }
     }
 }
 ```
+| Feature | HashMap | LinkedHashMap | TreeMap |
+  |---------|---------|--------------|---------|
+  | Order Guarantee | None | Insertion or Access | Sorted by Key |
+  | get/put Performance | O(1) | O(1) | O(log n) |
+  | Memory Usage | Lower | Medium | Higher |
+  | Iteration Performance | O(capacity + size) | O(size) | O(size) |
+  | Null Keys | One allowed | One allowed | Not allowed |
+  | Null Values | Multiple allowed | Multiple allowed | Multiple allowed |
+  | Thread Safety | None | None | None |
+  | Use Case | General purpose | Predictable iteration, LRU caches | Sorted data |
 
-### Differences Between HashMap and WeakHashMap
+* **When to Use LinkedHashMap**:
 
-| Feature | HashMap | WeakHashMap |
-|---------|---------|-------------|
-| Key References | Strong references | Weak references |
-| Memory Management | Manually remove entries | Automatic cleanup of unused keys |
-| Performance | Generally faster | Slightly slower due to reference management |
-| Thread Safety | Not thread-safe | Not thread-safe |
-| Entry Removal | Only when explicitly removed | Removed when keys are garbage collected |
-| Null Keys | Supports one null key | Does not reliably support null keys |
+  1. **Predictable iteration order is needed**:
+     * User preferences with insertion order
+     * Step-by-step processes
+     * Maintaining order of network requests
 
-### Common Use Cases
+  2. **LRU Cache implementation**:
+     * Caching database query results
+     * In-memory content caching
+     * Session management
 
-1. **Memory-Sensitive Caches**: Allows cached objects to be reclaimed when no longer needed
-2. **Observer Patterns**: Maintaining references to listeners without preventing them from being garbage collected
-3. **Temporary Associations**: When you need temporary mappings that shouldn't prevent garbage collection
+  3. **When both fast access and ordering matter**:
+     * Form field validation (maintain field order while providing quick lookups)
+     * Page navigation history
+     * Ordered command processing
 
-### Limitations and Considerations
-
-* **Non-Deterministic Cleanup**: You cannot predict exactly when unused entries will be removed
-* **Performance Overhead**: The reference management adds some overhead
-* **Not for Critical Data**: Don't use for data that must persist regardless of external references
+* **Important Notes**:
+  * Updates to existing keys do not affect order (unless access-ordered)
+  * Slightly slower than HashMap due to maintaining the linked list
+  * Not synchronized by default (use Collections.synchronizedMap for thread safety)
+  * If both ordering and concurrency are needed, consider ConcurrentLinkedHashMap from libraries like Guava
 
 [Back to Top](#table-of-contents)
+
+
+
+
+## How do WeakHashMap works?
+
+WeakHashMap is a specialized Map implementation that uses weak references for its keys. This unique property makes it useful for specific memory management scenarios where automatic cleanup of unused key-value pairs is desired.
+
+* **Key Concept: Reference Types in Java**:
+  * **Strong References**: Normal Java references that prevent garbage collection
+  * **Soft References**: Garbage collected only when memory is low
+  * **Weak References**: Don't prevent garbage collection of the referent
+  * **Phantom References**: Used for cleanup actions after object is finalized
+
+* **WeakHashMap Internal Workings**:
+
+  1. Keys are stored as WeakReferences
+  2. When a key object has no other strong references, it becomes eligible for garbage collection
+  3. After garbage collection, the associated entries are automatically removed
+  4. Reference queue is used to track and clean up "stale" entries
+
+* **Behavior Demonstration**:
+
+  ```java
+  import java.util.Map;
+  import java.util.WeakHashMap;
+
+  public class WeakHashMapDemo {
+      public static void main(String[] args) {
+          // Create a WeakHashMap
+          Map<Key, String> weakMap = new WeakHashMap<>();
+          
+          // Create a strong reference to a key
+          Key strongKey = new Key("StrongKey");
+          
+          // Add entries to map
+          weakMap.put(strongKey, "I will persist");
+          weakMap.put(new Key("WeakKey"), "I will disappear");
+          
+          System.out.println("Initial map size: " + weakMap.size());
+          System.out.println("Map contents: " + weakMap);
+          
+          // Trigger garbage collection
+          System.gc();
+          try { Thread.sleep(100); } catch (InterruptedException e) { }
+          
+          System.out.println("\nAfter garbage collection:");
+          System.out.println("Map size: " + weakMap.size());
+          System.out.println("Map contents: " + weakMap);
+          
+          // Remove the strong reference
+          strongKey = null;
+          
+          // Trigger garbage collection again
+          System.gc();
+          try { Thread.sleep(100); } catch (InterruptedException e) { }
+          
+          System.out.println("\nAfter removing strong reference and GC:");
+          System.out.println("Map size: " + weakMap.size());
+          System.out.println("Map contents: " + weakMap);
+      }
+      
+      static class Key {
+          private String id;
+          
+          public Key(String id) {
+              this.id = id;
+          }
+          
+          @Override
+          public String toString() {
+              return "Key[" + id + "]";
+          }
+          
+          @Override
+          public boolean equals(Object obj) {
+              if (this == obj) return true;
+              if (obj == null || getClass() != obj.getClass()) return false;
+              Key key = (Key) obj;
+              return id.equals(key.id);
+          }
+          
+          @Override
+          public int hashCode() {
+              return id.hashCode();
+          }
+          
+          @Override
+          protected void finalize() {
+              System.out.println("Finalizing Key: " + id);
+          }
+      }
+  }
+  ```
+
+* **Key Characteristics**:
+  * Values maintain strong references (not eligible for automatic GC)
+  * Entries are removed in an indeterminate time after key becomes unreachable
+  * Not synchronized (not thread-safe)
+  * Iterators are fail-fast (throw ConcurrentModificationException)
+  * Doesn't guarantee the order of iteration
+
+* **Common Use Cases**:
+
+  1. **Memory-sensitive caches**:
+  
+  ```java
+  import java.util.Map;
+  import java.util.WeakHashMap;
+
+  public class CacheExample {
+      // Cache that automatically removes entries when keys are no longer referenced
+      private final Map<CacheKey, ExpensiveResource> resourceCache = new WeakHashMap<>();
+      
+      public ExpensiveResource getResource(String id) {
+          CacheKey key = new CacheKey(id);
+          
+          // Check if resource exists in cache
+          ExpensiveResource resource = resourceCache.get(key);
+          
+          if (resource == null) {
+              // Create resource if not in cache
+              resource = new ExpensiveResource(id);
+              resourceCache.put(key, resource);
+          }
+          
+          return resource;
+      }
+      
+      static class CacheKey {
+          private final String id;
+          
+          public CacheKey(String id) {
+              this.id = id;
+          }
+          
+          // equals and hashCode implementations...
+      }
+      
+      static class ExpensiveResource {
+          // Resource that's expensive to create
+          private final String data;
+          
+          public ExpensiveResource(String id) {
+              this.data = "Data for " + id;
+              // Simulate expensive creation
+              try { Thread.sleep(100); } catch (InterruptedException e) { }
+          }
+      }
+  }
+  ```
+
+  2. **Registration of listeners/observers**:
+  
+  ```java
+  import java.util.Map;
+  import java.util.WeakHashMap;
+
+  public class EventPublisher {
+      // Store listeners without preventing their garbage collection
+      private final Map<EventListener, Object> listeners = new WeakHashMap<>();
+      private static final Object PRESENT = new Object();
+      
+      public void addListener(EventListener listener) {
+          listeners.put(listener, PRESENT);
+      }
+      
+      public void removeListener(EventListener listener) {
+          listeners.remove(listener);
+      }
+      
+      public void fireEvent(String eventData) {
+          for (EventListener listener : listeners.keySet()) {
+              listener.onEvent(eventData);
+          }
+      }
+      
+      interface EventListener {
+          void onEvent(String eventData);
+      }
+  }
+  ```
+
+  3. **Associating metadata with objects**:
+  
+  ```java
+  import java.util.Map;
+  import java.util.WeakHashMap;
+
+  public class MetadataManager {
+      // Maps objects to their metadata without preventing GC
+      private static final Map<Object, Metadata> objectMetadata = new WeakHashMap<>();
+      
+      public static void setMetadata(Object obj, String name, Object value) {
+          Metadata metadata = objectMetadata.computeIfAbsent(obj, k -> new Metadata());
+          metadata.setProperty(name, value);
+      }
+      
+      public static Object getMetadata(Object obj, String name) {
+          Metadata metadata = objectMetadata.get(obj);
+          return metadata != null ? metadata.getProperty(name) : null;
+      }
+      
+      static class Metadata {
+          private final Map<String, Object> properties = new HashMap<>();
+          
+          public void setProperty(String name, Object value) {
+              properties.put(name, value);
+          }
+          
+          public Object getProperty(String name) {
+              return properties.get(name);
+          }
+      }
+  }
+  ```
+
+* **Limitations and Caveats**:
+  * **Non-deterministic removal**: Entries might persist until next GC cycle
+  * **Value references**: Strong references to values might indirectly hold keys
+  * **String/primitive keys**: Interned strings and boxed primitives may not be collected as expected
+  * **Thread-safety**: Not synchronized by default
+  * **Performance**: Slightly lower performance than HashMap due to weak reference handling
+
+* **WeakHashMap vs HashMap**:
+
+  | Aspect | HashMap | WeakHashMap |
+  |--------|---------|-------------|
+  | Key References | Strong | Weak |
+  | Entry Lifetime | Until explicitly removed | Until key becomes unreachable |
+  | Use Cases | General purpose | Caching, metadata, listeners |
+  | Performance | Slightly better | Slightly worse due to reference management |
+  | Memory Usage | Higher (holds onto all entries) | Can be lower (entries may be removed) |
+
+[Back to Top](#table-of-contents)
+
 
 ## What is EnumMap in Java
 
