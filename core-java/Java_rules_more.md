@@ -1,0 +1,725 @@
+# Java Rules: Abstract Classes, Interfaces, Polymorphism, and More
+| #   | Question Text                                                                                     |
+|-----|---------------------------------------------------------------------------------------------------|
+| **Abstract Classes**                                                                                   |
+| 1   | [What is an abstract class and how is it declared?](#abstract-classes)                           |
+| 2   | [Can abstract classes be instantiated directly?](#abstract-classes)                             |
+| 3   | [What types of methods can abstract classes contain?](#abstract-classes)                        |
+| 4   | [What are the rules for abstract methods in abstract classes?](#abstract-classes)               |
+| 5   | [Can abstract classes have constructors and instance variables?](#abstract-classes)             |
+| **Interfaces**                                                                                        |
+| 6   | [What are the characteristics of interface methods and fields?](#interfaces)                    |
+| 7   | [What are default and static methods in interfaces?](#interfaces)                               |
+| 8   | [What is the purpose of private methods in interfaces?](#interfaces)                            |
+| **Marker Interfaces**                                                                                 |
+| 9   | [What are marker interfaces and their use cases?](#marker-interfaces)                           |
+| 10  | [What are examples of marker interfaces in Java?](#marker-interfaces)                           |
+| **Functional Interfaces**                                                                             |
+| 11  | [What is a functional interface and how is it used?](#functional-interfaces)                    |
+| 12  | [What are examples of functional interfaces in Java?](#functional-interfaces)                   |
+| **Polymorphism**                                                                                      |
+| 13  | [What is polymorphism and what are its types?](#polymorphism)                                   |
+| 14  | [How does runtime polymorphism work in Java?](#polymorphism)                                    |
+| **Method Overloading**                                                                                |
+| 15  | [What is method overloading and how is it achieved?](#method-overloading)                       |
+| 16  | [What are the rules for method overloading?](#method-overloading)                               |
+| **Method Overriding**                                                                                 |
+| 17  | [What is method overriding and how is it different from overloading?](#method-overriding)       |
+| 18  | [What are the rules for method overriding?](#method-overriding)                                 |
+| **Enums**                                                                                             |
+| 19  | [What are enums and how are they used in Java?](#enums)                                         |
+| 20  | [What are the special methods provided by enums?](#enums)                                       |
+| **Constructors**                                                                                      |
+| 21  | [What are constructors and how are they used?](#constructors)                                   |
+| 22  | [What are the rules for constructor overloading?](#constructors)                                |
+| **final Keyword**                                                                                     |
+| 23  | [What are the uses of the `final` keyword in Java?](#final-keyword)                             |
+| 24  | [What are the rules for final variables, methods, and classes?](#final-keyword)                 |
+| **transient Keyword**                                                                                 |
+| 25  | [What is the purpose of the `transient` keyword?](#transient-keyword)                           |
+| 26  | [What are the rules for using `transient` fields?](#transient-keyword)                          |
+| **synchronized Keyword**                                                                              |
+| 27  | [What is the `synchronized` keyword and how is it used?](#synchronized-keyword)                 |
+| 28  | [What are the rules for synchronized methods and blocks?](#synchronized-keyword)                |
+| **Exceptions**                                                                                        |
+| 29  | [What is the hierarchy of exceptions in Java?](#exceptions)                                     |
+| 30  | [What are the differences between checked and unchecked exceptions?](#exceptions)              |
+| 31  | [What are the rules for try-catch-finally blocks?](#exceptions)                                 |
+| 32  | [How are custom exceptions created in Java?](#exceptions)                                       |
+| **Java 8 Features**                                                                                   |
+| 33  | [What are lambda expressions and how are they used?](#java-8-features)                          |
+| 34  | [What is the Stream API and how does it work?](#java-8-features)                                |
+| 35  | [What are default methods in interfaces?](#java-8-features)                                    |
+| 36  | [What are method references and their types?](#java-8-features)                                |
+| 37  | [What is the purpose of the `Optional` class?](#java-8-features)                                |
+| **Multithreading**                                                                                    |
+| 38  | [What are the ways to create threads in Java?](#multithreading)                                 |
+| 39  | [What are the rules for thread safety?](#multithreading)                                        |
+| 40  | [What are the features of the Executors framework?](#multithreading)                           |
+| **Advanced Exception Handling**                                                                      |
+| 41  | [What are the best practices for exception handling?](#advanced-exception-handling)            |
+| 42  | [What are assertions and how are they used?](#advanced-exception-handling)                     |
+| **Generics**                                                                                         |
+| 43  | [What are generics and their rules in Java?](#generics)                                        |
+| 44  | [What are bounded and unbounded wildcards in generics?](#generics)                             |
+| **Collections Framework**                                                                            |
+| 45  | [What are the main interfaces and classes in the Collections Framework?](#collections-framework)|
+| 46  | [What are the rules for using iterators with collections?](#collections-framework)             |
+| **I/O and NIO**                                                                                      |
+| 47  | [What are the main classes for I/O operations in Java?](#io-and-nio)                           |
+| 48  | [What are the features of NIO in Java?](#io-and-nio)                                           |
+| **Inner Classes**                                                                                    |
+| 49  | [What are the types of inner classes and their rules?](#inner-classes)                         |
+| 50  | [What are the rules for anonymous inner classes?](#inner-classes)                              |
+| **Reflection**                                                                                       |
+| 51  | [What is reflection and how is it used in Java?](#reflection)                                  |
+| 52  | [What are the rules and limitations of reflection?](#reflection)                               |
+| **Annotations**                                                                                      |
+| 53  | [What are annotations and their types in Java?](#annotations)                                  |
+| 54  | [What are meta-annotations and their purposes?](#annotations)                                  |
+| **Java Memory Model**                                                                                |
+| 55  | [What are the key concepts of the Java Memory Model?](#java-memory-model)                      |
+| 56  | [What are the rules for thread safety in the Java Memory Model?](#java-memory-model)           |
+| **Garbage Collection**                                                                               |
+| 57  | [What are the types of references in Java and their impact on garbage collection?](#garbage-collection)|
+| 58  | [What are the common garbage collection algorithms in Java?](#garbage-collection)              |
+| **Java 9+ Features**                                                                                 |
+| 59  | [What is the Java Module System and its features?](#java-9-features)                           |
+| 60  | [What are the new features introduced in Java 9 and later versions?](#java-9-features)         |
+
+## Abstract Classes
+
+1. Can contain `static`, `final`, and `instance variables` with any `access modifier`
+2. Can have constructors, static methods, and final methods
+3. Abstract methods cannot be `private`, `static`, or `final`
+4. Declared with the `abstract` keyword
+5. Cannot be instantiated directly
+6. May contain both abstract and concrete methods
+7. Abstract methods have no implementation (no body) and must be overridden by subclasses
+8. Subclasses must either implement all abstract methods or be declared abstract themselves 
+9. Can extend only one abstract class (single inheritance)
+10. Can implement interfaces
+11. A class can extend only one abstract class but implement multiple interfaces
+
+## Interfaces
+
+1. All interface methods are implicitly `public` and `abstract` (before Java 8)
+2. Cannot be instantiated.
+3. All fields are implicitly `public`, `static`, and `final` (constants) 
+4. Cannot contain instance variables (only constants)
+5. Since Java 8, interfaces can have:
+   - Default methods (with `default` keyword)
+   - Static methods
+6. Since Java 9, interfaces can have `private` methods 
+7. No constructors allowed 
+8. A class implements an interface using the `implements` keyword
+9. A class must implement all methods of the interface unless it's abstract
+10. An interface can extend multiple interfaces (multiple inheritance) 
+
+
+
+## Marker Interfaces
+
+1. Empty interfaces with no methods or constants
+2. Used to "mark" a class as having a certain capability
+3. Provides runtime type information through instanceof operator
+4. Examples include `Serializable`, `Cloneable`, and `Remote`
+5. Cannot be annotated with `@FunctionalInterface`
+6. Often replaced by annotations in modern Java
+7. No method implementation requirements for implementing classes
+
+## Functional Interfaces
+
+1. Contains exactly one abstract method
+2. Can be annotated with `@FunctionalInterface` (optional but recommended)
+3. Can contain `default` methods, `static` methods, and methods from `Object` class
+4. Can be implemented using lambda expressions
+5. Examples include `Runnable`, `Comparable`, `Consumer`, `Supplier`, `Function`
+6. Can be used with method references
+7. Cannot have more than one abstract method (will cause compilation error if annotated with `@FunctionalInterface`)
+8. Compatible with Java's Stream API
+
+## Polymorphism
+
+1. Ability of an object to take many forms
+2. Achieved through inheritance and interfaces
+3. Types:
+   - Compile-time (method overloading)
+   - Runtime (method overriding)
+4. Method calls are resolved at runtime based on the object's actual type
+5. Objects behave differently based on their actual runtime type
+6. Allows reference variables of a superclass to refer to subclass objects
+7. Enables the use of superclass type to refer to subclass object
+8. Enables code reuse and flexibility
+9. Polymorphic references can only access methods defined in the reference type
+10. Type casting required to access subclass-specific methods
+
+## Method Overloading
+
+1. Multiple methods with the same name but different parameters in the same class
+2. Differences can be:
+   - Number of parameters
+   - Data type of parameters
+   - Order of parameters
+3. Return type alone is not sufficient for overloading and Return type is optional.
+4. Determined at compile time (static binding)
+5. Cannot overload methods that differ only by return type
+6. Access modifiers can be different for overloaded methods
+7. Exception declarations can be different
+8. Can involve static and non-static methods
+9. Constructors can be overloaded
+10. Method resolution follows most specific parameter matching
+
+## Method Overriding
+
+1. Redefining a superclass method in a subclass with the same signature
+2. Method signature must be identical (name, parameters, return type)
+3. Return type can be a subtype of the original return type (covariant return)
+4. Access modifier cannot be more restrictive than the overridden method
+5. Cannot throw broader exceptions than the overridden method
+6. `@Override` annotation is recommended but optional
+7. `final` methods cannot be overridden
+8. `static` methods cannot be overridden (although they can be hidden)
+9. `private` methods cannot be overridden
+10. Determined at runtime (dynamic binding)
+11. Can use `super` keyword to call the superclass version of the method
+
+## Enums
+
+1. Special type of class that represents a group of constants
+2. Declared using the `enum` keyword
+3. All enum constants are implicitly `public`, `static`, and `final`
+4. Cannot use `new` to instantiate an enum
+5. Can implement interfaces but cannot extend other classes
+6. Can contain constructors, methods, and fields
+7. Constructor must be private (implicitly if not specified)
+8. Can contain abstract methods, but all constants must implement them.
+Can have instance-specific behavior by providing method implementations in constant definitions
+9. Implicitly extends `java.lang.Enum`
+10. Has special methods like `values()`, `valueOf()`, `ordinal()`, and `name()`
+11. Can be used in switch statements
+13. Thread-safe singleton implementation
+13. Can be used with `EnumSet` and `EnumMap` for efficient operations.
+
+```java 
+enum Operation {
+    ADD {
+        @Override
+        public int apply(int a, int b) {
+            return a + b;
+        }
+    },
+    SUBTRACT {
+        @Override
+        public int apply(int a, int b) {
+            return a - b;
+        }
+    },
+    MULTIPLY {
+        @Override
+        public int apply(int a, int b) {
+            return a * b;
+        }
+    };
+
+    // Abstract method
+    public abstract int apply(int a, int b);
+}
+
+//main
+public class Main {
+    public static void main(String[] args) {
+        int a = 5, b = 3;
+
+        System.out.println(Operation.ADD.apply(a, b));        // 8
+        System.out.println(Operation.SUBTRACT.apply(a, b));   // 2
+        System.out.println(Operation.MULTIPLY.apply(a, b));   // 15
+    }
+}
+
+```
+
+---
+
+# Java Rules: Constructors, final keyword, transient, synchronized, and exceptions
+
+## Constructors
+
+1. Have the same name as the class
+2. No return type (not even void)
+3. Are called during object creation with the `new` keyword
+4. Can be overloaded (multiple constructors with different parameters)
+5. If no constructor is provided, Java adds a default no-argument constructor
+6. Can use `this()` to call another constructor in the same class (must be first statement)
+7. In subclasses, can use `super()` to call parent constructor (must be first statement)
+8. If parent class has no default constructor, subclass must explicitly call a parent constructor
+9. Can have any access modifier (`public`, `protected`, `private`, default)
+10. Private constructors prevent instantiation from outside the class
+11. Constructors can `throw` exceptions
+12. Static initialization blocks run before constructors
+13. Instance initialization blocks run before constructors but after the parent constructor call
+14. Cannot be inherited or overridden
+
+## final keyword
+
+1. **With variables**:
+   - Makes the variable a constant (cannot be reassigned)
+   - Must be initialized at declaration or in constructor
+   - Local final variables can be initialized later but only once
+    ``` java
+      public class Test {
+         public static void main(String[] args) {
+        final int x;  // declared but not initialized
+        x = 10;       // initialized later — valid
+        // x = 20;    // ❌ Error: cannot assign a value again
+        System.out.println(x); // 10
+        }
+     }
+    ```
+   - Final reference variables cannot refer to a different object, but the object's state can be modified
+    ``` java
+     final Person p = new Person("Alice");
+
+        p.name = "Bob";      // ✅ Allowed: modifying internal state
+        // p = new Person("Charlie"); // ❌ Not allowed: can't reassign final reference
+    ```
+   - Often used with `static` for class constants
+
+2. **With methods**:
+   - Cannot be overridden in subclasses
+   - Can be overloaded
+   - Promotes security and performance optimization
+
+3. **With classes**:
+   - Cannot be extended/subclassed
+   - All methods are implicitly final
+   - Examples: `String`, `Integer`, and wrapper classes
+   - Often used for immutable classes
+
+4. **With parameters**:
+   - Parameter cannot be reassigned within the method
+   - Object state can still be modified
+
+5. **With inner classes**:
+   - Can access final local variables of the enclosing method
+
+## transient keyword
+
+1. Used to indicate that a field should not be serialized
+2. Applies only to instance variables
+3. During deserialization, transient fields are initialized with default values
+4. Cannot be applied to methods or classes
+5. Cannot be used with `static` fields (as static fields are not serialized anyway)
+6. Often used for security-sensitive data or derived fields
+7. Has no effect if the class doesn't implement `Serializable`
+8. Can be used with custom serialization (readObject/writeObject methods)
+9. Not reflected in XML serialization frameworks like JAXB
+10. Custom serialization can still manually serialize transient fields if needed
+
+## synchronized keyword
+
+1. **With methods**:
+   - Entire method becomes a synchronized block on the object's monitor
+   - For instance methods, synchronizes on `this` (current object)
+   - For static methods, synchronizes on the Class object
+   - Only one thread can execute any synchronized method of the object at a time
+
+2. **With blocks**:
+   - Syntax: `synchronized(object) { ... }`
+   - Acquires lock on the specified object
+   - Provides more fine-grained control than synchronized methods
+   - Can reduce contention by synchronizing only critical sections
+
+3. **General rules**:
+   - Provides mutual exclusion and visibility guarantees
+   - Can cause deadlocks if locks acquired in inconsistent order
+   - Does not make the reference to the synchronized object thread-safe
+   - Synchronizing on non-final fields can be dangerous
+   - Affects performance due to lock acquisition overhead
+   - Reentrancy: a thread can acquire the same lock multiple times
+   - Not inherited in subclass method overrides (must be explicitly declared)
+
+## Exceptions
+
+1. **Hierarchy**:
+   - `Throwable` (root)
+     - `Error`: serious problems, not usually caught
+     - `Exception`: recoverable conditions
+       - Checked exceptions: must be declared or caught
+       - `RuntimeException` (unchecked): not required to be declared or caught
+
+2. **Checked Exceptions**:
+   - Must be handled with try-catch or declared with `throws` clause
+   - Compile-time enforcement
+   - Examples: `IOException`, `SQLException`
+
+3. **Unchecked Exceptions (RuntimeExceptions)**:
+   - Not required to be caught or declared
+   - Examples: `NullPointerException`, `ArrayIndexOutOfBoundsException`
+
+4. **Try-Catch-Finally**:
+   - `try`: Contains code that might throw exceptions
+   - `catch`: Handles specific exceptions
+   - `finally`: Always executes regardless of exception (unless `System.exit()` is called)
+   - Since Java 7: try-with-resources for automatic resource management
+
+5. **Throw and Throws**:
+   - `throw`: Used to explicitly throw an exception
+   - `throws`: Declares that a method might throw certain exceptions
+
+6. **Custom Exceptions**:
+   - Should extend `Exception` for checked exceptions
+   - Should extend `RuntimeException` for unchecked exceptions
+   - Should include constructors that call the parent constructors
+
+7. **Exception Chaining**:
+   - `throw new SomeException("Message", originalException);`
+   - Preserves the original cause
+
+8. **Multi-catch** (Java 7+):
+   - `catch (IOException | SQLException e) { ... }`
+   - Exception types must not be in a subclass relationship
+
+9. **Important rules**:
+   - More specific exceptions must be caught before broader ones
+   - Subclass methods cannot throw broader checked exceptions than superclass method
+   - Finally block executes even if there's a return statement in try or catch
+   - Never empty catch blocks in production code
+   - Prefer specific exceptions over generic ones
+   - Clean up resources in finally blocks or use try-with-resources
+
+---
+I can definitely provide similar rule sets for other core Java concepts. Here are rules for some additional important Java topics:
+
+## Java 8 Features
+
+### Lambda Expressions
+1. Syntax: `(parameters) -> expression` or `(parameters) -> { statements; }`
+2. Can be used only with functional interfaces
+3. Parameter types can be inferred by the compiler
+4. Can access final or effectively final local variables
+5. Cannot modify local variables (must be effectively final)
+6. `this` refers to the enclosing class, not the lambda
+7. Can throw exceptions, but must conform to the functional interface
+8. Cannot specify return type explicitly
+
+### Stream API
+1. Streams do not store data; they process data from a source
+2. Stream operations are either intermediate (return a stream) or terminal (produce a result)
+3. Streams are lazy - evaluation only happens on terminal operations
+4. Streams can be traversed only once
+5. Operations are processed vertically (per element) not horizontally (per operation)
+6. Parallel streams use the ForkJoinPool.commonPool() by default
+7. Not suitable for side effects - focus on immutability
+8. Collectors are used for mutable reduction operations
+9. Ordered streams guarantee order; unordered streams may optimize operations
+
+### Default Methods
+1. Defined in interfaces with the `default` keyword
+2. Provide implementation within the interface
+3. Classes can override default methods
+4. If a class implements multiple interfaces with the same default method, it must override it
+5. Cannot be marked as `final`, `static`, `abstract`, or `synchronized`
+6. Can access static interface methods
+7. Cannot access instance variables (interfaces have none)
+8. Can be overridden by a default method in a sub-interface
+
+### Method References
+1. Syntax: `Class::methodName` or `instance::methodName`
+2. Four types: static methods, instance methods of particular objects, instance methods of arbitrary objects, constructors
+3. Must match the functional interface method signature
+4. Constructor references use `ClassName::new`
+5. Can't be used if additional logic is needed
+
+### Optional
+1. Container object that may or may not contain a non-null value
+2. Never return `null` from `Optional` methods; return `Optional.empty()`
+3. Avoid `Optional.get()` without checking `isPresent()`
+4. Prefer `orElse()`, `orElseGet()`, or `orElseThrow()`
+5. Don't use as method parameter or field type, only as return type
+6. `orElseGet()` is lazy; `orElse()` always evaluates its argument
+7. `map()` transforms value if present, `flatMap()` for when the transformation returns an Optional
+8. Cannot be serialized
+
+## Multithreading
+
+### Thread Creation
+1. Extend `Thread` class or implement `Runnable` interface
+2. Can't restart a thread once it has completed execution
+3. Thread priorities are hints to the scheduler, not guarantees
+4. Daemon threads are terminated when all user threads complete
+5. `Thread.sleep()` keeps lock ownership but pauses execution
+6. `Thread.join()` makes the current thread wait for another thread to die
+7. Thread names should be unique for debugging
+8. Thread groups are mostly obsolete
+
+### Thread Safety
+1. Always synchronize access to mutable shared data
+2. Avoid unnecessary synchronization for better performance
+3. Immutable objects are inherently thread-safe
+4. Thread-local variables provide per-thread isolated storage
+5. Volatile ensures visibility but doesn't guarantee atomicity
+6. CAS (Compare-And-Swap) operations can avoid locking
+7. High-level concurrency utilities preferred over raw synchronization
+
+### Locks and Conditions
+1. `ReentrantLock` provides same behavior as synchronized, plus additional features
+2. Must explicitly unlock in finally blocks
+3. `ReadWriteLock` allows concurrent reads but exclusive writes
+4. Lock fairness setting determines if longest-waiting thread gets lock first
+5. `Condition` objects can provide more fine-grained waiting/signaling
+6. `tryLock()` attempts to get lock without blocking
+7. `lockInterruptibly()` allows lock acquisition to be interrupted
+
+### Executors Framework
+1. Prefer executors over creating threads directly
+2. Thread pools reuse threads to reduce overhead
+3. `newFixedThreadPool` creates a fixed-size thread pool
+4. `newCachedThreadPool` creates threads as needed, reuses idle threads
+5. `newSingleThreadExecutor` guarantees sequential execution
+6. `ScheduledExecutorService` handles delayed and periodic tasks
+7. Always shut down executor services explicitly
+8. Handle uncaught exceptions via `UncaughtExceptionHandler`
+
+### Concurrent Collections
+1. Thread-safe without external synchronization
+2. `ConcurrentHashMap` provides better concurrency than `Hashtable`
+3. `CopyOnWriteArrayList` optimizes for read-heavy scenarios
+4. `BlockingQueue` supports producer-consumer pattern
+5. `ConcurrentSkipListMap` is a concurrent sorted map
+6. May not reflect the latest state of other threads
+7. Size-related operations (size, isEmpty) may not be accurate in concurrent contexts
+8. Iteration doesn't throw `ConcurrentModificationException`
+
+## Advanced Exception Handling
+
+### Best Practices
+1. Create specific exception types for specific error cases
+2. Include relevant information in exception messages
+3. Document all exceptions in Javadoc
+4. Don't catch `Throwable` or `Exception` (too broad)
+5. Release resources in finally blocks or use try-with-resources
+6. Log exceptions with stack traces
+7. Don't suppress exceptions without handling them
+8. Preserve the original exception when wrapping (exception chaining)
+9. Throw early, catch late
+10. Convert checked exceptions to unchecked when appropriate
+
+### Assertions
+1. Used for internal invariants and assumptions
+2. Disabled by default at runtime (enable with -ea flag)
+3. Not for validating public method parameters or user input
+4. Should not have side effects
+5. Used for conditions that should never happen in correct code
+
+### Java 7+ Exception Handling
+1. Try-with-resources manages `AutoCloseable` resources automatically
+2. Resources declared in try are closed in reverse order
+3. Suppressed exceptions are accessible via `getSuppressed()`
+4. Multi-catch reduces code duplication: `catch(IOException | SQLException ex)`
+5. More specific exception classes must be caught before more general ones
+6. Rethrowing precise exceptions preserves original exception types
+
+---
+
+Here are more essential Java concepts and their rules:
+
+## Generics
+
+1. Provide compile-time type safety for collections
+2. Declared using angle brackets: `class Box<T>`
+3. Type erasure: generic type information is removed at runtime
+4. Cannot create arrays of generic types: `new T[]` is illegal
+5. Cannot use primitives as type parameters (use wrapper classes)
+6. Wildcard `?` represents an unknown type
+7. Upper bounded wildcard: `<? extends Type>` accepts Type or its subtypes
+8. Lower bounded wildcard: `<? super Type>` accepts Type or its supertypes
+9. Unbounded wildcard: `<?>` accepts any type
+10. PECS principle: "Producer Extends, Consumer Super"
+11. Type parameters can have multiple bounds: `<T extends A & B & C>`
+12. Static members cannot refer to class type parameters
+13. Generic methods can be defined with their own type parameters
+14. Cannot catch or throw generic exception types
+
+## Collections Framework 
+
+1. All collections implement `Collection` interface (except Map)
+2. Main interfaces: `List`, `Set`, `Queue`, and `Map`
+3. `List`: ordered collection with duplicates allowed
+4. `Set`: collection with no duplicates
+5. `Queue`: collection designed for holding elements for processing
+6. `Map`: key-value pairs with unique keys
+7. `ArrayList`: dynamic array implementation of List
+8. `LinkedList`: doubly-linked list implementation of List and Queue
+9. `HashSet`: hash table implementation of Set
+10. `TreeSet`: sorted Set implementation using Red-Black Tree
+11. `HashMap`: hash table implementation of Map
+12. `TreeMap`: sorted Map implementation using Red-Black Tree
+13. Use `Iterator` for traversing collections
+14. `Collections` utility class provides useful algorithms
+15. Use generics with collections for type safety
+16. `Comparable` interface for natural ordering
+17. `Comparator` interface for custom ordering
+18. Fail-fast iterators throw `ConcurrentModificationException` if collection is modified during iteration
+19. Prefer concurrent collections for multithreaded access
+
+## I/O and NIO
+
+1. `InputStream` and `OutputStream` for byte-based I/O
+2. `Reader` and `Writer` for character-based I/O
+3. Always close streams in finally blocks or use try-with-resources
+4. Buffered streams improve performance
+5. `ObjectInputStream` and `ObjectOutputStream` for object serialization
+6. NIO provides non-blocking I/O operations
+7. `Channel` for connections to entities capable of I/O operations
+8. `Buffer` for data container used in channel operations
+9. `Selector` allows a single thread to manage multiple channels
+10. `Path` represents file system paths
+11. `Files` utility class for file operations
+12. Memory-mapped files provide faster I/O for large files
+13. `StandardCharsets` defines standard character encodings
+14. File locking allows coordination between processes
+15. Asynchronous I/O operations supported via CompletableFuture
+
+## Inner Classes
+
+1. Four types: static nested, inner (non-static nested), local, and anonymous
+2. Inner classes have access to all members of enclosing class
+3. Static nested classes can only access static members of enclosing class
+4. Local classes are defined in a block and can access final or effectively final local variables
+5. Anonymous classes create instances of unnamed classes that implement an interface or extend a class
+6. Inner class instances have implicit reference to enclosing instance
+7. Inner classes cannot declare static members (except constants)
+8. Nested classes can be declared with any access modifier
+9. Local and anonymous classes can only access final or effectively final local variables
+10. Anonymous classes cannot have constructors (they are implied)
+
+## Reflection
+
+1. Allows examination and modification of runtime behavior
+2. Main classes: `Class`, `Field`, `Method`, `Constructor`
+3. `Class.forName()` loads a class by name
+4. `.class` syntax gets a Class object for a type
+5. `object.getClass()` returns the runtime class of an object
+6. Access private members using `setAccessible(true)`
+7. Can create new instances via reflection using `newInstance()`
+8. Can invoke methods with `invoke()`
+9. Can access and modify fields with `get()` and `set()`
+10. Performance impact: reflection is slower than direct code
+11. Security considerations: can break encapsulation
+12. Used by many frameworks like Spring, Hibernate
+13. Cannot access information lost in type erasure
+14. Can examine annotations at runtime
+
+## Annotations
+
+1. Start with `@` symbol, followed by annotation name
+2. Defined using `@interface` keyword
+3. Three types: marker (no elements), single-element, and multi-element
+4. Can have default values: `String value() default ""`
+5. Meta-annotations: annotations that apply to other annotations
+6. `@Retention` determines annotation lifetime (SOURCE, CLASS, RUNTIME)
+7. `@Target` specifies where annotation can be applied
+8. `@Documented` includes annotations in Javadoc
+9. `@Inherited` allows subclasses to inherit annotations
+10. `@Repeatable` allows multiple annotations of same type
+11. Access at runtime via Reflection API
+12. Cannot extend other annotations or implement interfaces
+13. Element types limited to primitives, String, Class, enum, annotation, and arrays of these
+14. Often used for code generation, dependency injection, validation
+
+## Java Memory Model
+
+1. Defines how threads interact through memory
+2. Guarantees for properly synchronized code
+3. Happens-before relationship ensures memory visibility
+4. Volatile guarantees visibility but not atomicity
+5. Final fields are safely published if constructor doesn't leak this reference
+6. Double-checked locking without volatile is broken
+7. Memory barriers ensure ordering of operations
+8. Out-of-order execution can be performed by JVM for optimization
+9. Thread confinement avoids concurrency issues
+10. Thread-local storage provides isolated per-thread data
+11. Immutable objects are always thread-safe
+12. Synchronized methods/blocks establish happens-before relationships
+13. Lock acquisition/release creates memory barriers
+14. CAS (Compare And Swap) operations are atomic
+
+## Garbage Collection
+
+1. Automatic memory management system
+2. Objects eligible for GC when no references point to them
+3. System.gc() is only a suggestion, not guaranteed
+4. Four types of references: strong, soft, weak, and phantom
+5. Strong references prevent garbage collection
+6. Soft references cleared before OutOfMemoryError
+7. Weak references cleared during next GC cycle
+8. Phantom references allow cleanup before reclamation
+9. finalize() method called before garbage collection (deprecated)
+10. Try to avoid finalization due to performance impact
+11. Memory leaks can occur in Java (e.g., keeping unneeded references)
+12. Common GC algorithms: Serial, Parallel, CMS, G1, ZGC
+13. GC tuning through JVM parameters
+14. Use memory profilers to detect memory issues
+
+## Java 9+ Features
+
+1. **Module System (Java 9)**:
+   - Declared with module-info.java
+   - Explicit exports/requires statements
+   - Strong encapsulation beyond packages
+   - Reliable configuration with version conflicts detection
+
+2. **Reactive Streams (Java 9)**:
+   - Flow API for asynchronous stream processing
+   - Publisher/Subscriber/Processor interfaces
+   - Backpressure support
+   - Non-blocking handling of asynchronous data streams
+
+3. **JShell (Java 9)**:
+   - Interactive REPL (Read-Eval-Print Loop)
+   - Evaluates declarations, statements, and expressions
+   - Auto-completion and command history
+   - Snippet saving and loading
+
+4. **Private interface methods (Java 9)**:
+   - Support code reuse within interfaces
+   - Cannot be used by implementing classes
+   - Can be static or instance methods
+   - Help organize default method implementations
+
+5. **var keyword (Java 10)**:
+   - Local variable type inference
+   - Only for local variables with initializers
+   - Cannot use for method parameters, return types, fields
+   - Type is still static, just inferred by compiler
+
+6. **Switch Expressions (Java 12-14)**:
+   - Can return values
+   - No fall-through with arrow syntax
+   - Multiple case labels
+   - Yield statement for complex blocks
+
+7. **Text Blocks (Java 15)**:
+   - Multi-line string literals
+   - No escape sequences for most cases
+   - Preserves formatting with control over whitespace
+   - Can still use string concatenation and interpolation
+
+8. **Records (Java 16)**:
+   - Immutable data classes
+   - Automatic getters, equals, hashCode, toString
+   - Can declare additional methods
+   - Cannot extend other classes (implicitly extends Record)
+
+9. **Sealed Classes (Java 17)**:
+   - Restrict which classes can extend/implement
+   - Permits clause lists allowed subtypes
+   - Subclasses must be final, sealed, or non-sealed
+   - Works with records and interfaces
+
+10. **Pattern Matching (Java 16+)**:
+    - Enhanced instanceof with variable binding
+    - Pattern matching in switch statements
+    - Guards in patterns (when clause)
+    - Record patterns and deconstruction
