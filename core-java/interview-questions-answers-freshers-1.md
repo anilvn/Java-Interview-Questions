@@ -6,7 +6,7 @@
 
 This comprehensive Java programming guide covers essential concepts from basic features to advanced topics. It serves as both a learning resource and a quick reference for developers at all levels.
 
-## Additional Resources
+<!-- ## Additional Resources
 
 This documentation is part of a larger collection of Java and Spring Framework resources designed to help you master Java development from fundamentals to advanced enterprise applications.
 
@@ -16,7 +16,7 @@ This documentation is part of a larger collection of Java and Spring Framework r
 
 *If you find this resource helpful, please consider giving it a star and fork it for your personal use!*
 
----
+--- -->
 
 ## Table of Contents
 
@@ -41,29 +41,6 @@ This documentation is part of a larger collection of Java and Spring Framework r
 | 14 | [What is autoboxing and unboxing?](#what-is-autoboxing-and-unboxing) |
 | **Casting and Cloning** | |
 | 15 | [What is casting (implicit and explicit)?](#what-is-casting-implicit-and-explicit) |
-| 16 | [Different types of cloning available in Java? Difference between deep cloning and shallow cloning?](#different-types-of-cloning-available-in-java-difference-between-deep-cloning-and-shallow-cloning) |
-| **Strings and String Pool** | |
-| 17 | [What are string literals?](#what-are-string-literals) |
-| 18 | [What is the String constant pool?](#what-is-the-string-constant-pool) |
-| 19 | [String s_1 = "anil"; vs. String s_2 = new String("anil");](#string-s_1--anil-vs-string-s_2--new-stringanil) |
-| 20 | [Why is String not mutable, and how to develop a mutable String in Java?](#why-is-string-not-mutable-and-how-to-develop-a-mutable-string-in-java) |
-| 21 | [What is the difference between String, StringBuilder, and StringBuffer?](#what-is-the-difference-between-string-stringbuilder-and-stringbuffer) |
-| **Operators and Comparisons** | |
-| 22 | [What is the difference between == and .equals?](#what-is-the-difference-between--and-equals) |
-| 23 | [How do you convert a String to an int (parse)?](#how-do-you-convert-a-string-to-an-int-parse) |
-| 24 | ["12".equals(12) – What happened?](#12equals12--what-happened) |
-| **Singleton and Static** | |
-| 25 | [What is a singleton class in Java?](#what-is-a-singleton-class-in-java) |
-| 26 | [What is static in Java?](#what-is-static-in-java) |
-| 27 | [Why is the main method static in Java?](#why-is-the-main-method-static-in-java) |
-| 28 | [Can we run main() without the static keyword?](#can-we-run-main-without-the-static-keyword) |
-| 29 | [Can we run a Java class without a main method?](#can-we-run-a-java-class-without-a-main-method) |
-| 30 | [Can you declare the main method as final or private?](#can-you-declare-the-main-method-as-final-or-private) |
-| 31 | [Is main a keyword in Java? What are other identifiers?](#is-main-a-keyword-in-java-what-are-other-identifiers) |
-| 32 | [What if we write static public void instead of public static void?](#what-if-we-write-static-public-void-instead-of-public-static-void) |
-| 33 | [Can a static reference a non-static variable? What happens if it does?](#can-a-static-reference-a-non-static-variable-what-happens-if-it-does) |
-| 34 | [Can we override static variables?](#can-we-override-static-variables) |
-| 35 | [Can you declare a class as final?](#can-you-declare-a-class-as-final) |
 
 ## What are the features of Java?
 
