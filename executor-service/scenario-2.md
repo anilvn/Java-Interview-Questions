@@ -54,7 +54,18 @@ public class StockPriceAggregator {
                 logError("IEX Cloud API failed", ex);
                 return getDefaultPrice(symbol, "IEX");
             });
+         
+         // strategy-1
+         // Combine results and calculate average
+        CompletableFuture<Double> averagePriceFuture = apiyahooPrice
+                .thenCombine(alphaVantagePrice, Double::sum)
+                .thenCombine(iexPrice, Double::sum)
+                .thenApply(total -> total / 3);
+
+        Double averagePrice = averagePriceFuture.get();
+        System.out.println("Average Stock Price: " + averagePrice);
         
+        // strategy-2
         // Combine all results and calculate average
         return CompletableFuture.allOf(yahooPrice, alphaVantagePrice, iexPrice)
             .thenApply(v -> {

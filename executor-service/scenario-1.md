@@ -120,7 +120,7 @@ public void processOrderWithErrorHandling(Order order) {
             handleValidationFailure(order, ex);
             return null;
         });
-        
+
     CompletableFuture<Void> payment = CompletableFuture
         .runAsync(() -> processPayment(order), executor)
         .exceptionally(ex -> {
@@ -128,34 +128,30 @@ public void processOrderWithErrorHandling(Order order) {
             initiateRefundProcess(order, ex);
             return null;
         });
-        
-    CompletableFuture<Void> inventory = CompletableFuture
-        .runAsync(() -> updateInventory(order), executor)
-        .exceptionally(ex -> {
-            logError("Inventory update failed", ex);
-            rollbackInventoryChanges(order, ex);
-            return null;
-        });
-        
-    CompletableFuture<Void> notification = CompletableFuture
-        .runAsync(() -> sendConfirmationEmail(order), executor)
-        .exceptionally(ex -> {
-            logError("Email notification failed", ex);
-            scheduleEmailRetry(order, ex);
-            return null;
-        });
+
+    // You can add more tasks with similar patterns if needed
 
     CompletableFuture<Void> allTasks = CompletableFuture
-        .allOf(validation, payment, inventory, notification)
+        .allOf(validation, payment)
         .whenComplete((result, ex) -> {
             if (ex != null) {
+                logError("Overall order processing failed", ex);
                 handleOverallFailure(order, ex);
             } else {
                 finalizeSuccessfulOrder(order);
             }
         });
 
-    allTasks.join();
+    allTasks.join(); // Wait for completion
+}
+```
+you **can and should throw exceptions directly** in your task methods (like `validateOrder()`, `processPayment()`) when something goes wrong. This allows the `CompletableFuture`'s `.exceptionally()` or `.handle()` blocks to catch and process them cleanly.
+```java
+public void validateOrder(Order order) {
+    if (!isOrderValid(order)) {
+        throw new InvalidRequestException("Order validation failed due to missing fields.");
+    }
+    // ... proceed with validation logic
 }
 ```
 
