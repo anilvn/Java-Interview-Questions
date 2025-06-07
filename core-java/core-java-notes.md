@@ -26,9 +26,6 @@
 | **Method Overriding**                                                                                 |
 | 17  | [What is method overriding and how is it different from overloading?](#method-overriding)       |
 | 18  | [What are the rules for method overriding?](#method-overriding)                                 |
-| **Enums**                                                                                             |
-| 19  | [What are enums and how are they used in Java?](#enums)                                         |
-| 20  | [What are the special methods provided by enums?](#enums)                                       |
 | **Constructors**                                                                                      |
 | 21  | [What are constructors and how are they used?](#constructors)                                   |
 | 22  | [What are the rules for constructor overloading?](#constructors)                                |
@@ -89,7 +86,7 @@
 
 ## Abstract Classes
 
-1. Can contain `static`, `final`, and `instance variables` with any `access modifier`
+1. Can contain `static`, `final`, and `instance variables` with any `access modifier` (no restriction)
 2. Can have constructors, static methods, and final methods
 3. Abstract methods cannot be `private`, `static`, or `final`
 4. Declared with the `abstract` keyword
@@ -110,12 +107,97 @@
 5. Since Java 8, interfaces can have:
    - Default methods (with `default` keyword)
    - Static methods
-6. Since Java 9, interfaces can have `private` methods 
-7. No constructors allowed 
-8. A class implements an interface using the `implements` keyword
-9. A class must implement all methods of the interface unless it's abstract
-10. An interface can extend multiple interfaces (multiple inheritance) 
+      - `default` and `static` methods in interfaces are `implicitly public`.
+      - `default` methods have a body and can be overridden.
+6. `protected` or package-private methods are `not allowed` in interfaces.
+7. Since Java 9, interfaces can have `private` methods. and for internal reuse. `ex:` private static method(){ }
+8. No constructors allowed 
+9. A class implements an interface using the `implements` keyword
+10. A class must implement all methods of the interface unless it's abstract
+11. An interface can extend multiple interfaces (multiple inheritance) 
+<br/>
 
+- void m1(); non-static method un-implmented her in interface, can be implemented in class.
+
+#### Default Methods
+1. Defined in interfaces with the `default` keyword
+2. Provide implementation within the interface
+3. Can be overridden by a default method in a sub-interface
+4. If a class implements multiple interfaces with the same default method, it must override it
+5. Cannot be marked as `final`, `static`, `abstract`, or `synchronized`
+6. Can access static interface methods
+<details>
+<summary>code example for default methods in interface</summary>
+
+```java
+// ❌ Invalid default method declarations — commented to avoid compile errors
+interface InvalidDefaults {
+
+    // ❌ Cannot use final with default methods — they are meant to be overridden
+    // final default void method1();        
+
+    // ❌ Cannot use static with default methods — static and default don't go together
+    // static default void method2();       
+
+    // ❌ Cannot use abstract with default methods — default has a body, abstract doesn't
+    // abstract default void method3();     
+
+    // ❌ Cannot use synchronized — not allowed in interface methods
+    // synchronized default void method4(); 
+}
+
+
+// ✅ Multiple interfaces with same default method — must resolve conflict
+interface A {
+    default void greet() {
+        System.out.println("Hello from A");
+    }
+}
+
+interface B {
+    default void greet() {
+        System.out.println("Hello from B");
+    }
+}
+
+class MyClass implements A, B {
+    // Must override to resolve conflict between A and B
+    @Override
+    public void greet() {
+        System.out.println("Hello from MyClass");
+    }
+}
+
+
+// ✅ Overriding default method in a sub-interface
+interface Parent {
+    default void show() {
+        System.out.println("Parent show");
+    }
+}
+
+interface Child extends Parent {
+    @Override
+    default void show() {
+        System.out.println("Child show");
+    }
+}
+
+
+// ✅ Main class to run all examples
+public class DefaultMethodExamples {
+    public static void main(String[] args) {
+        System.out.println("=== Conflict Resolution ===");
+        MyClass obj = new MyClass();
+        obj.greet(); // Output: Hello from MyClass
+
+        System.out.println("\n=== Sub-interface override ===");
+        Child child = new Child() {}; // anonymous class implementation
+        child.show(); // Output: Child show
+    }
+}
+```
+</details>
 
 
 ## Marker Interfaces
@@ -127,6 +209,34 @@
 5. Cannot be annotated with `@FunctionalInterface`
 6. Often replaced by annotations in modern Java
 7. No method implementation requirements for implementing classes
+<details>
+<summary>example for Marker Interfaces with ID Card Analogy </summary>
+<br/>
+
+* Suppose you’re at a tech conference.
+* Some attendees have a **"VIP" badge**.
+* The badge has **no data or behavior**, just a **mark**.
+* At the entrance, the guard checks:
+  `"if (person instanceof VIP)"`
+  → Let them in first.
+
+
+```java
+public interface VIP {} // marker interface
+
+public class Person {}
+
+public class Guest extends Person implements VIP {}
+```
+
+Now you can write logic like:
+
+```java
+if (guest instanceof VIP) {
+    System.out.println("Give special treatment");
+}
+```
+</details>
 
 ## Functional Interfaces
 
@@ -138,6 +248,15 @@
 6. Can be used with method references
 7. Cannot have more than one abstract method (will cause compilation error if annotated with `@FunctionalInterface`)
 8. Compatible with Java's Stream API
+
+```java
+@FunctionalInterface
+interface MyComparator<T> {
+    int compare(T o1, T o2); // only abstract method
+
+    boolean equals(Object obj); // from Object class — ignored
+}
+```
 
 ## Polymorphism
 
@@ -156,21 +275,26 @@
 
 ## Method Overloading
 
+> **Method Overloading** is resolved at **compile-time**.                                                         
+> It refers to the ability to define multiple methods with the same name but different parameter types or counts in the same class.
+
 1. Multiple methods with the same name but different parameters in the same class
 2. Differences can be:
    - Number of parameters
    - Data type of parameters
    - Order of parameters
-3. Return type alone is not sufficient for overloading and Return type is optional.
+3. Cannot overload methods that differ only by return type. Return type alone is not sufficient for overloading and Return type is optional.
 4. Determined at compile time (static binding)
-5. Cannot overload methods that differ only by return type
-6. Access modifiers can be different for overloaded methods
-7. Exception declarations can be different
-8. Can involve static and non-static methods
-9. Constructors can be overloaded
-10. Method resolution follows most specific parameter matching
+5. Access modifiers can be different for overloaded methods. (Access modifiers alone is not sufficient)
+6. Exception declarations can be different
+7. Can involve static and non-static methods
+8. Constructors can be overloaded
+9. Method resolution follows most specific parameter matching
 
 ## Method Overriding
+
+> **Method Overriding** is resolved at **runtime**.                                                         
+> It allows a subclass to provide a specific implementation of a method already defined in its superclass.
 
 1. Redefining a superclass method in a subclass with the same signature
 2. Method signature must be identical (name, parameters, return type)
@@ -178,70 +302,37 @@
 4. Access modifier cannot be more restrictive than the overridden method
 5. Cannot throw broader exceptions than the overridden method
 6. `@Override` annotation is recommended but optional
-7. `final` methods cannot be overridden
-8. `static` methods cannot be overridden (although they can be hidden)
-9. `private` methods cannot be overridden
-10. Determined at runtime (dynamic binding)
-11. Can use `super` keyword to call the superclass version of the method
+7. `final`, `static`, `private` methods cannot be overridden
+   - `static` methods cannot be overridden (although they can be hidden)
+   - `private` methods cannot be overridden
+8. Determined at runtime (dynamic binding)
+9. Can use `super` keyword to call the superclass version of the method
 
-## Enums
+ **Example for Covariant Return type:**
 
-1. Special type of class that represents a group of constants
-2. Declared using the `enum` keyword
-3. All enum constants are implicitly `public`, `static`, and `final`
-4. Cannot use `new` to instantiate an enum
-5. Can implement interfaces but cannot extend other classes
-6. Can contain constructors, methods, and fields
-7. Constructor must be private (implicitly if not specified)
-8. Can contain abstract methods, but all constants must implement them.
-Can have instance-specific behavior by providing method implementations in constant definitions
-9. Implicitly extends `java.lang.Enum`
-10. Has special methods like `values()`, `valueOf()`, `ordinal()`, and `name()`
-11. Can be used in switch statements
-13. Thread-safe singleton implementation
-13. Can be used with `EnumSet` and `EnumMap` for efficient operations.
+```java
+class Animal {}
 
-```java 
-enum Operation {
-    ADD {
-        @Override
-        public int apply(int a, int b) {
-            return a + b;
-        }
-    },
-    SUBTRACT {
-        @Override
-        public int apply(int a, int b) {
-            return a - b;
-        }
-    },
-    MULTIPLY {
-        @Override
-        public int apply(int a, int b) {
-            return a * b;
-        }
-    };
+class Dog extends Animal {}
 
-    // Abstract method
-    public abstract int apply(int a, int b);
-}
-
-//main
-public class Main {
-    public static void main(String[] args) {
-        int a = 5, b = 3;
-
-        System.out.println(Operation.ADD.apply(a, b));        // 8
-        System.out.println(Operation.SUBTRACT.apply(a, b));   // 2
-        System.out.println(Operation.MULTIPLY.apply(a, b));   // 15
+class Parent {
+    Animal getAnimal() {
+        return new Animal();
     }
 }
 
+class Child extends Parent {
+    Dog getAnimal() {
+        return new Dog(); // Valid: Dog is a subclass of Animal
+    }
+}
 ```
 
----
+In the above code:
 
-# Java Rules: Constructors, final keyword, transient, synchronized, and exceptions
+* `Parent.getAnimal()` returns `Animal`
+* `Child.getAnimal()` returns `Dog`, which is a subclass of `Animal`
+* This is valid because of covariant return type
 
 ## Constructors
 
@@ -259,6 +350,21 @@ public class Main {
 12. Static initialization blocks run before constructors
 13. Instance initialization blocks run before constructors but after the parent constructor call
 14. Cannot be inherited or overridden
+
+```java
+class Parent {
+    Parent(int x) {   // No default (no-arg) constructor
+        System.out.println("Parent constructor: " + x);
+    }
+}
+
+class Child extends Parent {
+    Child() {
+        // Implicit call to super() here — but no Parent() exists, so compile error!
+        System.out.println("Child constructor");
+    }
+}
+```
 
 ## final keyword
 
@@ -289,6 +395,28 @@ public class Main {
    - Cannot be overridden in subclasses
    - Can be overloaded
    - Promotes security and performance optimization
+```java
+public class Main {
+
+    // final method - cannot be overridden
+    public final void show(String msg) {
+        System.out.println("Message: " + msg);
+    }
+
+    // overloaded method - same method name, different parameter
+    public void show(int number) {
+        System.out.println("Number: " + number);
+    }
+
+    public static void main(String[] args) {
+        Main obj = new Main();
+
+        // Calling overloaded methods
+        obj.show("Hello, World!");  // Calls final method
+        obj.show(123);              // Calls overloaded method
+    }
+}
+```
 
 3. **With classes**:
    - Cannot be extended/subclassed
@@ -302,19 +430,80 @@ public class Main {
 
 5. **With inner classes**:
    - Can access final local variables of the enclosing method
+<details>
+<summary>example</summary>
+
+```java
+public class Main {
+
+    public void validExample() {
+        System.out.println("=== Valid Example ===");
+        
+        final String greeting = "Hello";          // explicitly final
+        int number = 100;                         // effectively final (not modified)
+
+        class InnerClass {
+            public void print() {
+                System.out.println("Greeting: " + greeting);
+                System.out.println("Number: " + number);
+            }
+        }
+
+        InnerClass inner = new InnerClass();
+        inner.print();
+    }
+
+    public void invalidExample() {
+        System.out.println("\n=== Invalid Example ===");
+
+        String name = "Anil";
+        name = "Valsa";  // ❌ Now it's NOT effectively final
+
+        class InnerClass {
+            public void print() {
+                // ❌ Compile-time error if uncommented
+                // System.out.println("Name: " + name);
+            }
+        }
+
+        InnerClass inner = new InnerClass();
+        inner.print();
+    }
+
+    public static void main(String[] args) {
+        Main obj = new Main();
+
+        obj.validExample();
+
+        // Uncommenting this will cause a compile error
+        // obj.invalidExample();
+    }
+}
+```
+</details>
 
 ## transient keyword
 
 1. Used to indicate that a field should not be serialized
 2. Applies only to instance variables
-3. During deserialization, transient fields are initialized with default values
-4. Cannot be applied to methods or classes
-5. Cannot be used with `static` fields (as static fields are not serialized anyway)
+3. Cannot be used with `static` fields (as static fields are not serialized anyway)
+4. During deserialization, transient fields are initialized with default values
+5. Cannot be applied to methods or classes
 6. Often used for security-sensitive data or derived fields
 7. Has no effect if the class doesn't implement `Serializable`
 8. Can be used with custom serialization (readObject/writeObject methods)
 9. Not reflected in XML serialization frameworks like JAXB
 10. Custom serialization can still manually serialize transient fields if needed
+
+
+<details>
+<summary>serialize transient fields using Custom serialization</summary>
+
+* `transient` fields are **not saved automatically** when an object is serialized.
+* You can still save them by writing your own methods called `writeObject()` and `readObject()`.
+* Inside these methods, you tell Java how to save and load the transient fields manually.
+* This way, you control how the transient data is stored and restored.
+</details>
 
 ## synchronized keyword
 
@@ -323,6 +512,19 @@ public class Main {
    - For instance methods, synchronizes on `this` (current object)
    - For static methods, synchronizes on the Class object
    - Only one thread can execute any synchronized method of the object at a time
+<details>
+<summary>more notes on synchronizatoin with methods</summary>
+
+* **Instance methods:**
+  When you use `synchronized` on an instance method, the lock is on the current object (`this`).
+  This means two threads can run the same method at the same time **if they are using different objects**.
+
+* **Static methods:**
+  When you use `synchronized` on a static method, the lock is on the **Class object** itself.
+  This means only one thread can run any synchronized static method at a time, no matter which instance is used.
+</details>
+
+<br/>
 
 2. **With blocks**:
    - Syntax: `synchronized(object) { ... }`
@@ -349,6 +551,18 @@ public class Main {
 6. `Thread.join()` makes the current thread wait for another thread to die
 7. Thread names should be unique for debugging
 8. Thread groups are mostly obsolete
+
+#### Difference Between `sleep()` and `wait()`:
+
+| Aspect            | `Thread.sleep(milliseconds)`                              | `Object.wait()`                                                                    |
+| ----------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| **Lock release**  | Does **NOT** release the lock.                            | **Releases** the lock on the object.                                               |
+| **Usage context** | Can be called anywhere (doesn't require synchronization). | Must be called inside a synchronized block/method on the object you're waiting on. |
+| **Thread state**  | Thread pauses for specified time but keeps the lock.      | Thread pauses and releases lock until notified.                                    |
+| **Waking up**     | Wakes after the sleep time ends (or interrupted).         | Wakes when another thread calls `notify()` or `notifyAll()` on the same object.    |
+| **Purpose**       | Pause execution temporarily.                              | Wait for a condition or signal from another thread.                                |
+
+---
 
 ### Thread Safety
 1. Always synchronize access to mutable shared data
@@ -410,7 +624,7 @@ public class Main {
    - `try`: Contains code that might throw exceptions
    - `catch`: Handles specific exceptions
    - `finally`: Always executes regardless of exception (unless `System.exit()` is called)
-   - Since Java 7: try-with-resources for automatic resource management
+   - Since Java 7: `try-with-resources` for automatic resource management
 
 5. **Throw and Throws**:
    - `throw`: Used to explicitly throw an exception
@@ -436,59 +650,6 @@ public class Main {
    - Never empty catch blocks in production code
    - Prefer specific exceptions over generic ones
    - Clean up resources in finally blocks or use try-with-resources
-
----
-I can definitely provide similar rule sets for other core Java concepts. Here are rules for some additional important Java topics:
-
-## Java 8 Features
-
-### Lambda Expressions
-1. Syntax: `(parameters) -> expression` or `(parameters) -> { statements; }`
-2. Can be used only with functional interfaces
-3. Parameter types can be inferred by the compiler
-4. Can access final or effectively final local variables
-5. Cannot modify local variables (must be effectively final)
-6. `this` refers to the enclosing class, not the lambda
-7. Can throw exceptions, but must conform to the functional interface
-8. Cannot specify return type explicitly
-
-### Stream API
-1. Streams do not store data; they process data from a source
-2. Stream operations are either intermediate (return a stream) or terminal (produce a result)
-3. Streams are lazy - evaluation only happens on terminal operations
-4. Streams can be traversed only once
-5. Operations are processed vertically (per element) not horizontally (per operation)
-6. Parallel streams use the ForkJoinPool.commonPool() by default
-7. Not suitable for side effects - focus on immutability
-8. Collectors are used for mutable reduction operations
-9. Ordered streams guarantee order; unordered streams may optimize operations
-
-### Default Methods
-1. Defined in interfaces with the `default` keyword
-2. Provide implementation within the interface
-3. Classes can override default methods
-4. If a class implements multiple interfaces with the same default method, it must override it
-5. Cannot be marked as `final`, `static`, `abstract`, or `synchronized`
-6. Can access static interface methods
-7. Cannot access instance variables (interfaces have none)
-8. Can be overridden by a default method in a sub-interface
-
-### Method References
-1. Syntax: `Class::methodName` or `instance::methodName`
-2. Four types: static methods, instance methods of particular objects, instance methods of arbitrary objects, constructors
-3. Must match the functional interface method signature
-4. Constructor references use `ClassName::new`
-5. Can't be used if additional logic is needed
-
-### Optional
-1. Container object that may or may not contain a non-null value
-2. Never return `null` from `Optional` methods; return `Optional.empty()`
-3. Avoid `Optional.get()` without checking `isPresent()`
-4. Prefer `orElse()`, `orElseGet()`, or `orElseThrow()`
-5. Don't use as method parameter or field type, only as return type
-6. `orElseGet()` is lazy; `orElse()` always evaluates its argument
-7. `map()` transforms value if present, `flatMap()` for when the transformation returns an Optional
-8. Cannot be serialized
 
 ## Advanced Exception Handling
 
@@ -519,9 +680,53 @@ I can definitely provide similar rule sets for other core Java concepts. Here ar
 5. More specific exception classes must be caught before more general ones
 6. Rethrowing precise exceptions preserves original exception types
 
----
 
-Here are more essential Java concepts and their rules:
+
+## Java 8 Features
+
+### Lambda Expressions
+1. Syntax: `(parameters) -> expression` or `(parameters) -> { statements; }`
+2. Can be used only with functional interfaces
+3. Parameter types can be inferred by the compiler
+4. Can access final or effectively final local variables
+5. Cannot modify local variables (must be effectively final)
+6. `this` refers to the enclosing class, not the lambda
+7. Can throw exceptions, but must conform to the functional interface
+8. Cannot specify return type explicitly
+
+### Stream API
+1. Streams do not store data; they process data from a source
+2. Stream operations are either intermediate (return a stream) or terminal (produce a result)
+3. Streams are lazy - evaluation only happens on terminal operations
+4. Streams can be traversed only once
+5. Operations are processed vertically (per element) not horizontally (per operation)
+6. Parallel streams use the ForkJoinPool.commonPool() by default
+7. Not suitable for side effects - focus on immutability
+8. Collectors are used for mutable reduction operations
+9. Ordered streams guarantee order; unordered streams may optimize operations
+
+
+
+
+### Method References
+1. Syntax: `Class::methodName` or `instance::methodName`
+2. Four types: static methods, instance methods of particular objects, instance methods of arbitrary objects, constructors
+3. Must match the functional interface method signature
+4. Constructor references use `ClassName::new`
+5. Can't be used if additional logic is needed
+
+### Optional
+1. Container object that may or may not contain a non-null value
+2. Never return `null` from `Optional` methods; return `Optional.empty()`
+3. Avoid `Optional.get()` without checking `isPresent()`
+4. Prefer `orElse()`, `orElseGet()`, or `orElseThrow()`
+5. Don't use as method parameter or field type, only as return type
+6. `orElseGet()` is lazy; `orElse()` always evaluates its argument
+7. `map()` transforms value if present, `flatMap()` for when the transformation returns an Optional
+8. Cannot be serialized
+
+
+
 
 ## Generics
 

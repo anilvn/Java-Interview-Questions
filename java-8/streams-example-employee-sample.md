@@ -4,6 +4,38 @@
 
 This section demonstrates various stream operations applied specifically to a list of `Employee` objects, covering common data manipulation tasks.
 
+
+- [Iterating Over Employees](#iterating-over-employees)
+- [Collecting & Filtering Employee Data](#collecting--filtering-employee-data)
+    - [Collect only the names of all employees into a new List.](#collect-only-the-names-of-all-employees-into-a-new-list)
+    - [Filter employees older than 30.](#filter-employees-older-than-30)
+    - [Find unique and duplicate employee names.](#find-unique-and-duplicate-employee-names)
+    - [Store unique employee objs.](#store-unique-employee-objs)
+    - [Store unique employee objs on the basis of -(key,value).](#store-unique-employee-objs-on-the-basis-of--keyvalue)
+- [Grouping Employees](#grouping-employees)
+    - [Group employees by their Department.](#group-employees-by-their-department)
+    - [Group employees by Active Status (Active vs. Inactive).](#group-employees-by-active-status-active-vs-inactive)
+    - [Count employees in each Department.](#count-employees-in-each-department)
+- [Sorting Employees](#sorting-employees)
+    - [Sort employees by Name in ascending order.](#sort-employees-by-name-in-ascending-order)
+    - [Sort employees by Name in descending order.](#sort-employees-by-name-in-descending-order)
+    - [Multi-level sorting: Sort by City Descending, then by Name Ascending.](#multi-level-sorting-sort-by-city-descending-then-by-name-ascending)
+    - [Multi-level sorting: Sort by City Descending, then by Name Descending.](#multi-level-sorting-sort-by-city-descending-then-by-name-descending)
+    - [Select the top 3 Employees with the highest Salaries.](#select-the-top-3-employees-with-the-highest-salaries)
+    - [Select Employees starting from the 4th highest Salary onwards.](#select-employees-starting-from-the-4th-highest-salary-onwards)
+    - [Select the 2nd & 3rd youngest Employees.](#select-the-2nd--3rd-youngest-employees)
+- [Employee Statistics](#-employee-statistics)
+    - [Find the Employee with the Maximum Salary.](#find-the-employee-with-the-maximum-salary)
+    - [Find the Employee with the Minimum Salary.](#find-the-employee-with-the-minimum-salary)
+    - [Calculate Summary Statistics for Employee Ages (Count, Sum, Min, Average, Max).](#calculate-summary-statistics-for-employee-ages-count-sum-min-average-max)
+    - [Find the Highest Salary in each Department.](#find-the-highest-salary-in-each-department)
+- [Stream Re-use Caveat](#-stream-re-use-caveat)
+    - [Streams cannot be reused after a terminal operation is called.](#streams-cannot-be-reused-after-a-terminal-operation-is-called-attempting-to-do-so-results-in-an-illegalstateexception)
+    - [To perform multiple operations, either recreate the stream or use a Supplier.](#to-perform-multiple-operations-either-recreate-the-stream-or-use-a-supplier)
+- [Conclusion](#-conclusion)
+
+
+
 ---
 ### Additional Resources
 
@@ -30,35 +62,8 @@ Feel free to star and fork these repositories if you find them useful!
         private String city;
         private String deptName;
         private boolean activeEmp;
-
-        public Employee(String name, int age, String gender, double salary, String city, String deptName, boolean activeEmp) {
-            this.name = name;
-            this.age = age;
-            this.gender = gender;
-            this.salary = salary;
-            this.city = city;
-            this.deptName = deptName;
-            this.activeEmp = activeEmp;
-        }
-
-        // Standard Getters
-        public String getName() { return name; }
-        public int getAge() { return age; }
-        public String getGender() { return gender; }
-        public double getSalary() { return salary; }
-        public String getCity() { return city; }
-        public String getDeptName() { return deptName; }
-        public boolean isActiveEmp() { return activeEmp; }
-
-        // Standard Setter for Salary (used in some examples)
-        public void setSalary(double salary) { this.salary = salary; }
-
-        @Override
-        public String toString() {
-            return "Employee{" + "name='" + name + '\'' + ", age=" + age + ", gender='" + gender + '\'' +
-                   ", salary=" + salary + ", city='" + city + '\'' + ", deptName='" + deptName + '\'' +
-                   ", activeEmp=" + activeEmp + '}';
-        }
+       
+        // Constructors , Getters, Setters , toStrring(), hashCode()
 
         @Override
         public boolean equals(Object o) {
@@ -71,10 +76,6 @@ Feel free to star and fork these repositories if you find them useful!
                    Objects.equals(deptName, employee.deptName);
         }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, age, gender, salary, city, deptName, activeEmp);
-        }
     }
     ```
 
@@ -97,7 +98,7 @@ Feel free to star and fork these repositories if you find them useful!
     );
     ```
 
-### 🚶‍♂️ Iterating Over Employees
+### Iterating Over Employees
 
 * _Iterating using an enhanced for-loop (traditional)._
     ```java
@@ -177,7 +178,51 @@ Feel free to star and fork these repositories if you find them useful!
     > _Duplicate Names Found: `[]` (In this specific dataset, names are unique)_
     > _Note: If 'Frank' was named 'Charlie', Duplicates would be `[Charlie]`._
 
----
+    <br/>
+* _Store unique employee objs._
+    ```java
+    Set<Employee> uniqueEmployees = employeeList.stream()
+        .collect(Collectors.toMap(
+            e -> e.getId(),            // Use employee ID as key
+            Function.identity(),       // Value: Employee object
+            (e1, e2) -> e1             // If duplicate key (same ID), keep first
+        ))
+        .values()
+        .stream()
+        .collect(Collectors.toSet());
+    ```
+
+* _Store unique employee objs on the basis of -(key,value)._
+    ```java
+     // ✅ 1. Store first employee per department
+        // If a department repeats, the first employee is retained, others are ignored
+        Map<String, Employee> firstEmployeeByDept = employeeList.stream()
+            .collect(Collectors.toMap(
+                Employee::getDeptName,             // Key: department name
+                e -> e,                            // Value: Employee object
+                (existing, replacement) -> existing // Merge function: keep first (ignore replacement)
+            ));
+
+        System.out.println("=== First Employee per Department ===");
+        firstEmployeeByDept.forEach((dept, emp) ->
+            System.out.println("Dept: " + dept + ", Employee: " + emp)
+        );
+
+        // ✅ 2. Store latest employee per department
+        // If a department repeats, the latest employee replaces the previous one
+        Map<String, Employee> latestEmployeeByDept = employeeList.stream()
+            .collect(Collectors.toMap(
+                Employee::getDeptName,                // Key: department name
+                e -> e,                               // Value: Employee object
+                (existing, replacement) -> replacement // Merge function: keep latest (override existing)
+            ));
+
+        System.out.println("\n=== Latest Employee per Department ===");
+        latestEmployeeByDept.forEach((dept, emp) ->
+            System.out.println("Dept: " + dept + ", Employee: " + emp)
+        );
+    });
+    ```
 
 ### 🧑‍🤝‍🧑 Grouping Employees
 
@@ -207,6 +252,7 @@ Feel free to star and fork these repositories if you find them useful!
     });
     ```
 
+
 * _Count employees in each Department._
     ```java
     System.out.println("\n--- Counting Employees per Department ---");
@@ -221,126 +267,116 @@ Feel free to star and fork these repositories if you find them useful!
     > _Marketing: 1_
     > _IT: 4_
 
-* _Group employees by City._
-    ```java
-    System.out.println("\n--- Grouping Employees by City ---");
-    Map<String, List<Employee>> employeesByCity = employeeList.stream()
-        .collect(Collectors.groupingBy(Employee::getCity));
-
-    employeesByCity.forEach((city, emps) -> {
-        System.out.println("City: " + city);
-        emps.forEach(emp -> System.out.println("  " + emp.getName()));
-    });
-    ```
 
 ---
 
 ### 📊 Sorting Employees
 
-* _Sort employees by Name (Ascending)._
-    ```java
-    import java.util.Comparator;
 
-    System.out.println("\n--- Sorting Employees by Name (Ascending) ---");
-    List<Employee> sortedByNameAsc = employeeList.stream()
-        .sorted(Comparator.comparing(Employee::getName))
-        //  .sorted(Comparator.comparing(Employee::getName)).reversed()
-       // .sorted( (e1,e2)-> (double) (e1.getsalary(),e2.getSalary()) )
-       // .sorted((e1, e2) ->  Double.compare(e1.getSalary(),e2.getSalary());
-      // .sorted((e1, e2) -> e1.getName().compareTo(e2.getName()))      // Equivalent lambda
-        .collect(Collectors.toList());
-    sortedByNameAsc.forEach(emp -> System.out.println(emp.getName()));
+* _Sort employees by Name in ascending order._
+    ```java
+        // Approach 1: Using Collections.sort() with natural ordering
+        Collections.sort(employees); // Uses compareTo() method
+
+        // Approach 2: Alternative using Stream API
+        List<Employee> sortedEmployees = employees.stream()
+                    .sorted() // Uses natural ordering (compareTo)
+                //  .sorted(Comparator.comparing(Employee::getName)
+                    .collect(Collectors.toList());
+
+        // Approach 3:Sort employees by salary in ascending order using anonymous class.
+        List<Employee> sortedEmployees = employees.stream()
+                .sorted(new Comparator<Employee>() {
+                    @Override
+                    public int compare(Employee e1, Employee e2) {
+                        return Double.compare(e1.getSalary(), e2.getSalary()); // Better than casting
+                    }
+                })
+                .collect(Collectors.toList());
+                
+        // Approach 4: Using lambda expression
+        List<Employee> sorted3 = employees.stream()
+                .sorted((e1, e2) -> e2.getName().compareTo(e1.getName()))
+                .collect(Collectors.toList());
+        /*
+        --------- Approach 5: Sorting using lambda and Double.compare ---------
+        Safer than (e1.getSalary() - e2.getSalary())
+        because it avoids floating-point precision errors
+        and potential overflow when working with large values.
+        Returns:
+         -1 if e1.getSalary() < e2.getSalary()
+          0 if equal
+          1 if e1.getSalary() > e2.getSalary()
+        */
+        List<Employee> sortedBySalary = employees.stream()
+                .sorted((e1, e2) -> Double.compare(e1.getSalary(), e2.getSalary())) // ascending order
+                .collect(Collectors.toList());
     ```
 
-
-    * _Sort employees by salary in ascending order using anonymous class._
+    ```
+    Comparator.comparing(Employee::getName).reversed()
+    Comparator.comparingInt(Employee::getId).reversed()
+    Comparator.comparingDouble(Employee::getSalary).reversed()
+    Comparator.comparingLong(Employee::getMobile).reversed()
+    Comparator.comparing(Employee::getJoiningDate).reversed()           -  LocalDate
+    ```
+* _Sort employees by Name in descending order._
     ```java
-List<Employee> sortedEmployees = employees.stream()
-        .sorted(new Comparator<Employee>() {
+        // Approach 1: Using Collections.sort() with reverse order
+        Collections.sort(employees, Collections.reverseOrder());
+
+        // Approach 2: Using Collections.reverseOrder() with method reference
+        List<Employee> sorted1 = employees.stream()
+                .sorted(Comparator.comparing(Employee::getName).reversed())
+                .collect(Collectors.toList());
+        
+        // Approach 3: Using anonymous comparator for descending order
+        List<Employee> sorted2 = employees.stream()
+                .sorted(new Comparator<Employee>() {
+                    @Override
+                    public int compare(Employee e1, Employee e2) {
+                        return e2.getName().compareTo(e1.getName()); // Reverse order
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // Approach 4: Using lambda expression
+        List<Employee> sorted3 = employees.stream()
+                .sorted((e1, e2) -> e2.getName().compareTo(e1.getName()))
+                .collect(Collectors.toList());
+    ```
+
+* _Multi-level sorting: Sort by City Descending, then by Name Ascending.._
+    ```java
+        List<Employee> sortedEmployees = employees.stream()
+                .sorted(Comparator.comparing(Employee::getCity).reversed() // City descending
+                        .thenComparing(Employee::getName)) // Then name ascending
+                .collect(Collectors.toList());
+
+    ```
+
+* _Multi-level sorting: Sort by City Descending, then by Name Descending.._
+    ```java
+        List<Employee> sortedEmployees = employees.stream()
+                .sorted(Comparator.comparing(Employee::getCity).reversed() // City descending
+                        .thenComparing(Employee::getName).reversed()) // Then name descending
+                .collect(Collectors.toList());
+
+    ```
+
+* _Traditional approach for implementing the comparator interface method._
+    ```java
+    class SalaryComparator implements Comparator<Employee> {
         @Override
         public int compare(Employee e1, Employee e2) {
-                return (int) (e1.getSalary() - e2.getSalary());
-                }
-            })
-        .collect(Collectors.toList());
-    ```
-
-
-* _Sort employees by salary in ascending order using overridden compare method._
-  ```java
-employees.sort(new SalaryComparator());
-
-List<Employee> sortedEmployees = employees.stream()
-.sorted(new Comparator<Employee>() {
-    @Override
-    public int compare(Employee e1, Employee e2) {
-        return Double.compare(e1.getSalary(), e2.getSalary());
+            return Double.compare(e1.getSalary(), e2.getSalary());
+        }
     }
-})
-.collect(Collectors.toList());
- ```
-* _Traditional approach for implementing the comparator interface method._
- ```java
-class SalaryComparator implements Comparator<Employee> {
-    @Override
-    public int compare(Employee e1, Employee e2) {
-        return Double.compare(e1.getSalary(), e2.getSalary());
-    }
-}
-```
 
-* _Sort employees by Salary (Descending)._
-    ```java
-    System.out.println("\n--- Sorting Employees by Salary (Descending) ---");
-    List<Employee> sortedBySalaryDesc = employeeList.stream()
-        .sorted(Comparator.comparingDouble(Employee::getSalary).reversed())
-        // .sorted((e1, e2) -> Double.compare(e2.getSalary(), e1.getSalary())) // Equivalent lambda
-        .collect(Collectors.toList());
-    sortedBySalaryDesc.forEach(emp -> System.out.println(emp.getName() + ": " + emp.getSalary()));
+    Collections.sort(employees, new SalaryComparator());  // Sorts in ascending order of salary
+
     ```
-
-* _Sort employees by Age (Ascending)._
-    ```java
-    System.out.println("\n--- Sorting Employees by Age (Ascending) ---");
-    List<Employee> sortedByAgeAsc = employeeList.stream()
-        .sorted(Comparator.comparingInt(Employee::getAge))
-        .collect(Collectors.toList());
-    sortedByAgeAsc.forEach(emp -> System.out.println(emp.getName() + ": " + emp.getAge()));
-    ```
-
-* _Collect employee Ages sorted Ascending._
-    ```java
-    System.out.println("\n--- Collecting Sorted Employee Ages (Ascending) ---");
-    List<Integer> sortedAges = employeeList.stream()
-                                        .map(Employee::getAge)
-                                        .sorted()
-                                        .collect(Collectors.toList());
-    System.out.println(sortedAges);
-    ```
-    > _Output: `[25, 28, 28, 30, 35, 35, 40]`_
-
-* _Multi-level sorting: Sort by City Descending, then by Name Ascending._
-    ```java
-    System.out.println("\n--- Sorting by City (Desc) then Name (Asc) ---");
-    Comparator<Employee> cityDescNameAsc = Comparator.comparing(Employee::getCity).reversed()
-                                                    .thenComparing(Employee::getName);
-    List<Employee> multiSorted1 = employeeList.stream()
-                                            .sorted(cityDescNameAsc)
-                                            .collect(Collectors.toList());
-    multiSorted1.forEach(emp -> System.out.println(emp.getCity() + " - " + emp.getName()));
-    ```
-
-* _Multi-level sorting: Sort by City Descending, then by Name Descending._
-    ```java
-    System.out.println("\n--- Sorting by City (Desc) then Name (Desc) ---");
-    Comparator<Employee> cityDescNameDesc = Comparator.comparing(Employee::getCity).reversed()
-                                                     .thenComparing(Employee::getName, Comparator.reverseOrder());
-    List<Employee> multiSorted2 = employeeList.stream()
-                                            .sorted(cityDescNameDesc)
-                                            .collect(Collectors.toList());
-    multiSorted2.forEach(emp -> System.out.println(emp.getCity() + " - " + emp.getName()));
-    ```
-
+    
 * _Select the top 3 Employees with the highest Salaries._
     ```java
     System.out.println("\n--- Top 3 Highest Paid Employees ---");
@@ -404,6 +440,7 @@ class SalaryComparator implements Comparator<Employee> {
     System.out.println("\n--- Summary Statistics for Employee Ages ---");
     IntSummaryStatistics ageStats = employeeList.stream()
         .mapToInt(Employee::getAge) // Convert to IntStream
+    //  .mapToDouble(Employee::getSalary) // Convert to DoubleStream - for the salaryStats
         .summaryStatistics(); // Calculate stats
 
     System.out.println("Count: " + ageStats.getCount());
@@ -419,21 +456,6 @@ class SalaryComparator implements Comparator<Employee> {
     > _Average: 31.57..._
     > _Max: 40_
 
-* _Calculate Summary Statistics for Employee Salaries._
-    ```java
-    import java.util.DoubleSummaryStatistics;
-
-    System.out.println("\n--- Summary Statistics for Employee Salaries ---");
-    DoubleSummaryStatistics salaryStats = employeeList.stream()
-        .mapToDouble(Employee::getSalary) // Convert to DoubleStream
-        .summaryStatistics(); // Calculate stats
-
-    System.out.println("Count: " + salaryStats.getCount());
-    System.out.println("Sum: " + salaryStats.getSum());
-    System.out.println("Min: " + salaryStats.getMin());
-    System.out.println("Average: " + salaryStats.getAverage());
-    System.out.println("Max: " + salaryStats.getMax());
-    ```
 
 * _Find the Highest Salary in each Department._
     ```java
@@ -499,4 +521,6 @@ class SalaryComparator implements Comparator<Employee> {
 
 ## ✅ Conclusion
 
-Java Streams offer a flexible and expressive paradigm for data processing. Mastering the distinction between **lazy intermediate operations** and **eager terminal operations**, along with understanding how to chain them effectively, unlocks the power of the Stream API for writing clean, declarative, and efficient Java code. Common problems, especially when working with collections of objects like `Employee`, can often be solved elegantly using combinations of stream operations like `filter`, `map`, `reduce`, `collect` (especially `groupingBy`), `sorted`, `distinct`, and summary statistics methods. Remember the single-consumption nature of streams and plan accordingly for multiple operations.
+> Java Streams offer a flexible and expressive paradigm for data processing. Mastering the distinction between **lazy intermediate operations** and **eager terminal operations**, along with understanding how to chain them effectively, unlocks the power of the Stream API for writing clean, declarative, and efficient Java code. 
+
+> Common problems, especially when working with collections of objects like `Employee`, can often be solved elegantly using combinations of stream operations like `filter`, `map`, `reduce`, `collect` (especially `groupingBy`), `sorted`, `distinct`, and summary statistics methods. Remember the single-consumption nature of streams and plan accordingly for multiple operations.

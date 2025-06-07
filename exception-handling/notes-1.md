@@ -66,6 +66,23 @@ java.lang.Object
 - If no method handles it, the program terminates
 - Exception moves from called method to calling method
 
+```
+main() → methodA() → methodB() → methodC() → Exception occurs here
+
+methodC does not handle it → propagates to methodB
+methodB does not handle it → propagates to methodA
+methodA does not handle it → propagates to main
+main does not handle it → JVM handles → program terminates
+```
+- ex with java code output:
+```
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at ExceptionPropagationDemo.methodC(ExceptionPropagationDemo.java:4)
+	at ExceptionPropagationDemo.methodB(ExceptionPropagationDemo.java:8)
+	at ExceptionPropagationDemo.methodA(ExceptionPropagationDemo.java:12)
+	at ExceptionPropagationDemo.main(ExceptionPropagationDemo.java:16)
+```
+
 ### Throwable Class
 - Root class for all exceptions and errors
 - Provides common methods like `getMessage()`, `printStackTrace()`, `getCause()`
@@ -270,6 +287,27 @@ try {
     // Handle multiple exceptions
     System.out.println(e.getMessage());
 }
+```
+- Limitations of Multi-Catch in Java
+```java
+try {
+            riskyOperation(); // May throw IOException or SQLException
+        } catch (IOException | SQLException e) {
+            // This block handles both IOException and SQLException
+            // The exception variable 'e' is effectively final, so you cannot reassign it
+            System.out.println("Exception caught: " + e.getMessage());
+
+            // catch (IOException | FileNotFoundException e) { } // Compile error: FileNotFoundException is a subclass of IOException
+            
+            // e = new IOException(); // Not allowed — exception variables in multi-catch are effectively final
+
+            // If you want type-specific handling, use instanceof checks (less preferred)
+            if (e instanceof SQLException) {
+                // Handle SQL-related logic
+            }
+
+        }
+    }
 ```
 
 ### Custom Exceptions
@@ -649,45 +687,6 @@ try {
     animal.makeSound(); // Must catch AnimalException (reference type)
 } catch (AnimalException e) { // Cannot catch DogException directly
     // Handle exception
-}
-```
-
-### Interface Exception Implementation Rules
-
-**Rules for implementing interface methods:**
-1. Can throw **same** or **narrower** checked exceptions
-2. Can throw **any unchecked** exceptions
-3. Can throw **no exceptions**
-4. Cannot throw **broader** or **new** checked exceptions
-
-```java
-interface Processor {
-    void process() throws IOException;
-}
-
-class FileProcessor implements Processor {
-    // VALID - same exception
-    public void process() throws IOException {
-        // implementation
-    }
-    
-    // VALID - narrower exception
-    public void process() throws FileNotFoundException {
-        // implementation
-    }
-    
-    // VALID - no exception
-    public void process() {
-        // implementation
-    }
-    
-    // INVALID - broader exception
-    // public void process() throws Exception { } // Compilation error
-    
-    // VALID - can add unchecked exceptions
-    public void process() throws IOException, RuntimeException {
-        // implementation
-    }
 }
 ```
 

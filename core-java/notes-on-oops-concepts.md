@@ -1,228 +1,209 @@
 
 
-# Understanding Association, Aggregation, and Composition in OOP
-  
-A deep dive into the relationships between classes in Object-Oriented Programming, including how **association**, **aggregation**, and **composition** differ in structure and behavior.
-
-This document serves as a quick reference guide for Java developers and OOP learners.
-
----
-
-## 📚 Table of Contents
+## Table of Contents
 
 | #   | Question                                                                 |
 |-----|--------------------------------------------------------------------------|
-| 🔹  | Association vs Aggregation vs Composition                                |
 | 1   | [What is Association in OOP?](#what-is-association-in-oop)              |
 | 2   | [What is Aggregation in OOP?](#what-is-aggregation-in-oop)              |
 | 3   | [What is Composition in OOP?](#what-is-composition-in-oop)              |
 | 4   | [Differences between Association, Aggregation, and Composition](#differences-between-association-aggregation-and-composition) |
 | 5   | [Notes On Enum](#notes-on-enum)                                          |
 | 6   | [Java Abstraction, Interfaces, Inheritance & Diamond Problem](#java-abstraction-interfaces-inheritance--diamond-problem) |
+| 7   | [How are Abstraction and Loose Coupling Achieved?](#1-how-are-abstraction-and-loose-coupling-achieved) |
+| 8   | [What is the Use of Interfaces?](#2-what-is-the-use-of-interfaces) |
+| 9   | [What is Inheritance and Types of Inheritance?](#3-what-is-inheritance-and-types-of-inheritance) |
+| 10  | [Why is Multiple Inheritance Not Possible in Java?](#4-why-is-multiple-inheritance-not-possible-in-java) |
+| 11  | [What is the Diamond Problem and How Does Java Solve It?](#5-what-is-the-diamond-problem-and-how-does-java-solve-it) |
+| 12  | [Java Multiple Inheritance: Code Examples](#no-error-in-this-program) |
 
 ---
 
-## What is Association in OOP?
 
-**Association** is a **general relationship** between two classes, where one object uses or refers to another.
+## 1. Association
 
-### 🔑 Key Features
-- Represents a **"uses-a"** or **"has-a"** relationship.
-- Objects can be related **without ownership**.
-- May be **unidirectional** or **bidirectional**.
+Represents a "uses-a" or "has-a" relationship.
+Objects can be related without ownership.
+May be unidirectional or bidirectional.
+Objects can exist independently.
+UML Notation: Plain line
 
-### 📌 Example
-
-```java
-class Student {
-    private String name;
-    // ...
-}
-
-class School {
-    private List<Student> students;
-}
-```
-
-> In this example, `School` has an **association** with `Student`.
-
-**Association types:**
-- One-to-One
-- One-to-Many
-- Many-to-One
-- Many-to-Many
-
-[🔝 Back to Top](#-table-of-contents)
-
----
-
-## What is Aggregation in OOP?
-
-**Aggregation** is a **special form of association** where one class contains a reference to another class, but without ownership.
-
-### 🔑 Key Features
-- Represents a **"has-a"** relationship.
-- **Weak** association – the child can exist **independently**.
-- Implemented via object reference.
-- Represented by a **hollow diamond** in UML diagrams.
-
-### 📌 Example
+### Example: One-to-Many Association (Doctor ↔ Patients)
 
 ```java
-class Professor {
+class Patient {
     private String name;
+
+    Patient(String name) {
+        this.name = name;
+    }
+
+    String getName() {
+        return name;
+    }
 }
 
-class Department {
-    private List<Professor> professors;
+class Doctor {
+    private String name;
 
-    Department(List<Professor> professors) {
-        this.professors = professors;
+    Doctor(String name) {
+        this.name = name;
+    }
+
+    void treat(Patient patient) {
+        System.out.println(name + " is treating patient " + patient.getName());
+    }
+}
+
+public class AssociationDemo {
+    public static void main(String[] args) {
+        Doctor doctor = new Doctor("Dr. Sharma");
+        Patient p1 = new Patient("John");
+        Patient p2 = new Patient("Sara");
+
+        // One-to-Many: A doctor can treat many patients
+        doctor.treat(p1);
+        doctor.treat(p2);
     }
 }
 ```
 
-> `Professor` exists independently of `Department`.
+Additional Examples:
 
-[🔝 Back to Top](#-table-of-contents)
+* One-to-One: A person has one passport.
+* Many-to-One: Many students belong to one school.
+* Many-to-Many: Students enroll in many courses and vice versa.
 
 ---
 
- ## What is Composition in OOP?
+## 2. Aggregation
 
-**Composition** is a **strong form of aggregation**, where one class owns another class and is responsible for its lifecycle.
+Represents a "has-a" relationship.
+Weak association – the child can exist independently.
+Implemented via object reference.
+Represented by a hollow diamond in UML diagrams.
 
-### 🔑 Key Features
-- Represents a **"part-of"** or **strong has-a** relationship.
-- **Strong** association – the child cannot exist **without** the parent.
-- Represented by a **solid diamond** in UML diagrams.
-
-### 📌 Example
+### Example: Aggregation (Team has Players)
 
 ```java
-class Room {
+import java.util.List;
+import java.util.ArrayList;
+
+class Player {
+    private String name;
+
+    Player(String name) {
+        this.name = name;
+    }
+
+    String getName() {
+        return name;
+    }
+}
+
+class Team {
+    private String teamName;
+    private List<Player> players;
+
+    Team(String teamName) {
+        this.teamName = teamName;
+        this.players = new ArrayList<>();
+    }
+
+    void addPlayer(Player player) {
+        players.add(player); // Aggregation: Player is referenced but not owned
+    }
+
+    void showTeam() {
+        System.out.println("Team: " + teamName);
+        for (Player p : players) {
+            System.out.println("- " + p.getName());
+        }
+    }
+}
+
+public class AggregationDemo {
+    public static void main(String[] args) {
+        Player p1 = new Player("Alice");
+        Player p2 = new Player("Bob");
+
+        Team team = new Team("Warriors");
+        team.addPlayer(p1);
+        team.addPlayer(p2);
+
+        team.showTeam();
+
+        // Players continue to exist even if the Team is disbanded
+    }
+}
+```
+
+---
+
+## 3. Composition
+
+Composition is a strong form of aggregation, where one class owns another class and is responsible for its lifecycle.
+Represents a "part-of" or strong has-a relationship.
+Strong association – the child cannot exist without the parent.
+Represented by a solid diamond in UML diagrams.
+
+### Example: Composition (Car has Engine)
+
+```java
+class Engine {
     private String type;
+
+    Engine(String type) {
+        this.type = type;
+    }
+
+    void start() {
+        System.out.println("Engine of type " + type + " started.");
+    }
 }
 
-class House {
-    private List<Room> rooms;
+class Car {
+    private Engine engine;
 
-    House() {
-        this.rooms = new ArrayList<>();
-        rooms.add(new Room());
+    Car() {
+        engine = new Engine("V8"); // Composition: Engine created and owned by Car
+    }
+
+    void drive() {
+        engine.start();
+        System.out.println("Car is driving.");
+    }
+}
+
+public class CompositionDemo {
+    public static void main(String[] args) {
+        Car car = new Car();
+        car.drive();
+
+        // If the Car is destroyed, the Engine is also destroyed
     }
 }
 ```
-
-> If `House` is destroyed, its `Room` objects also cease to exist.
-
-[🔝 Back to Top](#-table-of-contents)
 
 ---
 
 ## Differences between Association, Aggregation, and Composition
 
-Here’s a comparison table highlighting the key differences:
-
-| Feature                  | Association                      | Aggregation                      | Composition                          |
-|--------------------------|----------------------------------|----------------------------------|--------------------------------------|
-| **Type**                 | General relationship             | Weak "has-a"                     | Strong "has-a"                       |
-| **Dependency**           | No dependency                    | Child can exist independently    | Child **cannot** exist independently |
-| **Lifecycle**            | Independent                      | Independent                      | Dependent                            |
-| **UML Notation**         | Plain Line                       | Hollow diamond                   | Solid diamond                        |
-| **Example**              | Student ↔ School                 | Department → Professor           | House → Room                         |
-
-[🔝 Back to Top](#-table-of-contents)
+| Feature      | Association          | Aggregation                   | Composition                      |
+| ------------ | -------------------- | ----------------------------- | -------------------------------- |
+| Type         | General relationship | Weak "has-a"                  | Strong "has-a"                   |
+| Dependency   | No dependency        | Child can exist independently | Child cannot exist independently |
+| Lifecycle    | Independent          | Independent                   | Dependent                        |
+| UML Notation | Plain Line           | Hollow diamond                | Solid diamond                    |
+| Example      | Student ↔ School     | Department → Professor        | House → Room                     |
 
 ---
+
+
 
 
 
 <br/>
-<br/>
-
-## Notes On Enum
-
-- What are the advantages and limitations?
-- Can enums override methods from the java.lang.Enum class in Java?
-- How can you serialize and deserialize enums in Java?
-
-
-**1. Can enums override methods from `java.lang.Enum`?**
-🔹 **No**, enums **cannot override** methods from `java.lang.Enum` because it's a **final class**.
-
-**2. How to serialize/deserialize enums in Java?**
-🔹 Enums are **serializable by default**.
-🔹 Use `ObjectOutputStream` and `ObjectInputStream` for serialization and deserialization.
-🔹 In JSON (e.g., Jackson), just use `@JsonProperty` or default mapping works out-of-the-box.
-
-
-
-### Can enums override methods from the java.lang.Object class in Java?
-**Yes**, enums in Java **can override methods from `java.lang.Object`**, such as:
-
-* `toString()`
-* `equals()`
-* `hashCode()`
-* `clone()` (though enums can't be cloned)
-* `finalize()` (deprecated)
-
-🔹 Example:
-
-```java
-enum Color {
-    RED, GREEN, BLUE;
-
-    @Override
-    public String toString() {
-        return "Color: " + name();
-    }
-}
-```
-
-
-### ✅ **Advantages of using `enum` in Java:**
-
-1. **Type safety**:
-   Restricts variable to have only predefined values.
-
-2. **Readable code**:
-   Improves clarity with named constants.
-
-3. **Singleton-like behavior**:
-   Each enum constant is a singleton, ideal for shared constants.
-
-4. **Can have fields and methods**:
-   Enums can have constructors, fields, and methods for complex behavior.
-
-5. **Switch-case friendly**:
-   Works seamlessly with `switch` statements.
-
-6. **Built-in serialization support**:
-   Enums are serializable by default.
-
----
-
-### ❌ **Limitations of `enum`:**
-
-1. **Cannot extend classes**:
-   Enums **implicitly extend `java.lang.Enum`**, so they can't extend any other class.
-
-2. **Fixed constants**:
-   Enum constants are fixed at compile time—no dynamic addition.
-
-3. **Not suitable for all use cases**:
-   Enums are ideal for fixed sets; dynamic or frequently changing values aren’t a good fit.
-
-4. **Cannot clone**:
-   Enum instances can’t be cloned.
-
-5. **Limited flexibility**:
-   Overengineering for simple constants if not used wisely.
-
----
-
-<br/><br/><br/><br/>
 
 ## Java: Abstraction, Interfaces, Inheritance & Diamond Problem
 
@@ -463,6 +444,10 @@ class D extends B, C {  // NOT ALLOWED
 Java simply doesn't allow multiple class inheritance.
 
 #### 2. Multiple Inheritance with Interfaces
+
+When diamond problem occurs with interfaces:
+ - Interface Default Methods (Java 8+)
+
 ```java
 interface A {
     default void method() { System.out.println("A"); }
@@ -485,28 +470,6 @@ class D implements B, C {
     }
 }
 ```
-
-#### 3. Interface Default Methods (Java 8+)
-When diamond problem occurs with interfaces:
-```java
-interface I1 {
-    default void show() { System.out.println("I1"); }
-}
-
-interface I2 {
-    default void show() { System.out.println("I2"); }
-}
-
-class MyClass implements I1, I2 {
-    // MUST override to resolve ambiguity
-    public void show() {
-        I1.super.show(); // Call specific interface method
-        // or I2.super.show();
-        // or provide new implementation
-    }
-}
-```
-
 ### Key Points:
 - **Classes**: No multiple inheritance allowed - prevents diamond problem
 - **Interfaces**: Multiple inheritance allowed, but conflicts must be resolved explicitly
@@ -579,6 +542,53 @@ interface C {
 class D extends B implements C {
     public void extra() {
         System.out.println("C's method");
+    }
+}
+
+```
+
+```java
+interface MyInterface {
+    static void staticMethod() {
+        System.out.println("Static method in interface");
+    }
+}
+
+class MyClass implements MyInterface {
+    // No access to staticMethod() directly
+}
+
+public class Test {
+    public static void main(String[] args) {
+        // MyClass.staticMethod();  ❌ Compile-time error
+        // new MyClass().staticMethod(); ❌ Compile-time error
+
+        MyInterface.staticMethod(); // ✅ Correct usage
+    }
+}
+
+```
+
+```java
+// Parent class with a static method
+class Parent {
+    static void greet() { // Static method in Parent
+        System.out.println("Hello from Parent");
+    }
+}
+
+// Child class that hides the static method of Parent
+class Child extends Parent {
+    static void greet() { // Static method in Child (hides Parent's method, doesn't override it)
+        System.out.println("Hello from Child");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Parent p = new Child(); // Reference is of type Parent, object is of type Child
+        p.greet(); // Calls Parent.greet() because static methods are resolved at compile-time by reference type
+                  // This is method hiding, not overriding. So output will be: Hello from Parent
     }
 }
 

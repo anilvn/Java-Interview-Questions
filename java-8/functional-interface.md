@@ -16,8 +16,7 @@ A comprehensive overview of functional programming concepts in Java 8, including
 | 3  | [Static Methods in Interfaces](#static-methods-in-interfaces) |
 | 4  | [Private Methods in Interfaces](#private-methods-in-interfaces) |
 | 5  | [Interface vs Abstract Class](#interface-vs-abstract-class) |
-| **Generic Functional Interfaces** |                              |
-| 6 | [Generic Functional Interfaces](#generic-functional-interfaces) |
+
 
 
 ## What is a Functional Interface?
@@ -28,7 +27,7 @@ A functional interface is a special type of interface introduced in Java 8 that 
 
 * Annotated with `@FunctionalInterface` (optional but recommended)
 * Contains only one abstract method
-* Can have any number of default and static methods
+* Can have any number of default and static methods.(since java 9+ you can have private methods.)
 * Can include methods from the `java.lang.Object` class 
 * Supports functional programming paradigms in Java
 
@@ -51,6 +50,8 @@ interface I {
     // Object class methods don't count against the single abstract method rule
     String toString();
     int hashCode();
+
+    private void ex() {  }
 }
 
 // Implementation using a separate class
@@ -69,6 +70,10 @@ public class Test {
 ```
 
 > Note: `toString()` and `hashCode()` methods are being implemented by `java.lang.Object` class, so they don't violate the single abstract method rule.
+
+
+
+> `toString()` and `hashCode()` are methods from `Object`, so **they do not count** toward the abstract method count of a functional interface. The compiler ignores them when validating `@FunctionalInterface`.
 
 ### Example: Functional Interface with Inheritance
 
@@ -216,38 +221,6 @@ public class Test {
 
 > Note: Static methods in interfaces cannot be overridden in the implementing class. If you define a method with the same signature, it will be treated as a new method in the class.
 
-### Example: Main Method in Different Structures
-
-```java
-class A {
-    public static void main(String[] s) {
-        System.out.println("A-main");
-    }
-}
-
-abstract class B {
-    public static void main(String[] s) {
-        System.out.println("B-main");
-    }
-}
-
-enum C {
-    ;  // Empty enum body
-    public static void main(String[] s) {
-        System.out.println("C-main");
-    }
-}
-
-interface K {
-    public static void main(String[] s) {
-        System.out.println("K-main");
-    }
-}
-```
-
-> All of these classes can be compiled and their main methods can be executed.
-
-[Back to Top](#table-of-contents)
 
 ## Private Methods in Interfaces
 
@@ -337,120 +310,7 @@ Understanding the differences between interfaces and abstract classes is crucial
 | Multiple inheritance | Supported | Not supported |
 | Object class methods | Cannot directly override | Can override |
 
-### Example: Implementing Multiple Interfaces
 
-```java
-interface I {
-    default void m1() {
-        System.out.println("Default method-m1 from I");
-    }
-    void m2();  // Abstract method
-}
-
-public class Test {
-    public static void main(String[] args) {
-        // Anonymous inner class implementation
-        I obj = new I() {
-            @Override
-            public void m2() {
-                System.out.println("Anonymous-m2");
-                m1();  // Calling default method
-            }
-        };
-        obj.m2();  
-        /*
-           Output:
-           Anonymous-m2
-           Default method-m1 from I
-        */
-    }
-}
-```
 
 [Back to Top](#table-of-contents)
 
-
-
-### Example: Simple Generic Functional Interface
-
-```java
-@FunctionalInterface
-interface I<T> {
-    T m1(T x);
-}
-
-public class Main {
-    public static void main(String[] args) {
-        // Using the generic interface with Integer type
-        I<Integer> obj1 = (x) -> {
-            System.out.println("Lambda-Integer: " + x);
-            return x;
-        };
-        System.out.println(obj1.m1(999));  
-        /*
-           Output:
-           Lambda-Integer: 999
-           999
-        */
-
-        // Using the same interface with String type
-        I<String> obj2 = (String x) -> {
-            System.out.println("Lambda-String: " + x);
-            return "Hello " + x;
-        };
-        System.out.println(obj2.m1("world"));  
-        /*
-           Output:
-           Lambda-String: world
-           Hello world
-        */
-    }
-}
-```
-
-### Example: Generic Class with Type Parameter
-
-```java
-public class Box<T> {
-    private T data;
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    public T getData() {
-        return data;
-    }
-}
-
-public class Main {
-    public static void main(String[] args) {
-        // Using the generic Box with Integer type
-        Box<Integer> obj = new Box<>();
-        obj.setData(19);
-        System.out.println(obj.getData());  // Output: 19
-        
-        // Using the same Box class with String type
-        Box<String> strBox = new Box<>();
-        strBox.setData("Hello Generic");
-        System.out.println(strBox.getData());  // Output: Hello Generic
-    }
-}
-```
-
-[Back to Top](#table-of-contents)
-
-
-## Generic Functional Interfaces
-
-Generic functional interfaces allow for type-safe operations with different data types while maintaining the single abstract method constraint.
-
-### Key Characteristics:
-
-* Work with different data types
-* Enforce type safety at compile time
-* Improve code reusability
-* Enhance readability
-* Allow specifying types at instantiation
-
-[Back to Top](#table-of-contents)

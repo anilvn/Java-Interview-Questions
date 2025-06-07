@@ -60,6 +60,40 @@ public class FunctionDemo {
 }
 ```
 
+### Example: Basic Function Interface with Method Reference Usage
+
+```java
+import java.util.function.Function;
+
+public class MethodRefExamples {
+
+    public static void main(String[] args) {
+        // 1. Instance method of a particular object
+        String prefix = "Hello ";
+        Function<String, String> addPrefix = prefix::concat;  // s -> prefix.concat(s)
+        System.out.println(addPrefix.apply("World"));  // Hello World
+
+        // 2. Static method reference
+        Function<String, Integer> parseInt = Integer::parseInt; // parses String to Integer
+        System.out.println(parseInt.apply("123"));  // 123
+
+        // 3. Instance method of parameter type
+        Function<String, String> toUpperCase = String::toUpperCase;  // converts to uppercase
+        System.out.println(toUpperCase.apply("java"));  // JAVA
+
+        // 4. Composing functions: first toUpperCase, then length
+        Function<String, Integer> length = String::length;  // length of string
+
+        // compose: lengthFunction.compose(toUpperCase) means toUpperCase runs first, then length
+        Function<String, Integer> upperCaseLength = length.compose(toUpperCase);
+        System.out.println(upperCaseLength.apply("hello"));  // 5
+
+        // 5. andThen: toUpperCase.andThen(length) means toUpperCase runs first, then length
+        Function<String, Integer> upperCaseLength2 = toUpperCase.andThen(length);
+        System.out.println(upperCaseLength2.apply("world"));  // 5
+    }
+}
+```
 [Back to Top](#table-of-contents)
 
 ## Consumer Interface
@@ -117,6 +151,49 @@ public class ConsumerDemo {
            Name: Bob
            Name: Charlie
         */
+    }
+}
+```
+### Example: Basic Consumer Interface with Method Reference Usage
+```java
+import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.List;
+
+public class ConsumerMethodRefExamples {
+
+    public static void main(String[] args) {
+        // 1. Consumer using instance method of a particular object
+        String prefix = "Output: ";
+        Consumer<String> printWithPrefix = prefix::concatAndPrint; 
+        // Note: String class doesn't have concatAndPrint, so let's define our own object below
+
+        Printer printer = new Printer();
+        Consumer<String> printerConsumer = printer::print;  // instance method of Printer object
+        printerConsumer.accept("Hello World!");  // prints: Printer: Hello World!
+
+        // 2. Consumer using static method reference
+        Consumer<String> sysOut = System.out::println;  // static method println(String) of PrintStream
+        sysOut.accept("Printing with System.out.println");
+
+        // 3. Consumer using instance method of parameter type
+        Consumer<String> toLowerCasePrinter = s -> System.out.println(s.toLowerCase());
+        toLowerCasePrinter.accept("LOWER CASE EXAMPLE");
+
+        // Using method reference for the same: (no direct method reference here for println(toLowerCase))
+        // But if you want, you can split steps:
+        Consumer<String> print = System.out::println;
+        Function<String, String> toLower = String::toLowerCase;
+        // Combine manually:
+        Consumer<String> printLower = s -> print.accept(toLower.apply(s));
+        printLower.accept("Mixed Case Text");
+    }
+
+    // Helper class for example 1
+    static class Printer {
+        public void print(String s) {
+            System.out.println("Printer: " + s);
+        }
     }
 }
 ```

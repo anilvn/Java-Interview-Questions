@@ -596,7 +596,7 @@ Here are various ways to create a stream:
     ```
 
 ---
-
+<!-- 
 ## 🏢 Comprehensive Example: Employee Operations
 
 This example demonstrates various stream operations on a list of `Employee` objects.
@@ -695,4 +695,4 @@ public class EmployeeOperations {
             .collect(Collectors.toList());
         employeesWithRaise.forEach(System.out::println);
     }
-}
+} -->
