@@ -28,7 +28,6 @@ A comprehensive guide covering Java Collections Framework fundamentals, interfac
 | 11 | [How to synchronize ArrayList?](#how-to-synchronize-arraylist) |
 | **Iteration** |
 | 12 | [Why there is no method like Iterator.add() to add elements to the collection?](#why-there-is-no-method-like-iteratoradd-to-add-elements-to-the-collection) |
-| 15 | [How to synchronize ArrayList?](#how-to-synchronize-arraylist) |
 | 16 | [What is EnumMap in Java?](#what-is-enummap-in-java) |
 | 17 | [What is IdentityHashMap and when to use it?](#what-is-identityhashmap-and-when-to-use-it) |
 | 18 | [Why ConcurrentHashMap is faster than Hashtable in Java?](#why-concurrenthashmap-is-faster-than-hashtable-in-java) |
@@ -682,15 +681,13 @@ public class SynchronizedCollections {
         SortedSet<String> sortedSet = new TreeSet<>();
         sortedSet.add("a");
         sortedSet.add("b");
-        SortedSet<String> synchronizedSortedSet = 
-                Collections.synchronizedSortedSet(sortedSet);
+        SortedSet<String> synchronizedSortedSet = Collections.synchronizedSortedSet(sortedSet);
         
         // Synchronized SortedMap
         SortedMap<String, Integer> sortedMap = new TreeMap<>();
         sortedMap.put("a", 1);
         sortedMap.put("b", 2);
-        SortedMap<String, Integer> synchronizedSortedMap = 
-                Collections.synchronizedSortedMap(sortedMap);
+        SortedMap<String, Integer> synchronizedSortedMap = Collections.synchronizedSortedMap(sortedMap);
     }
 }
 ```
@@ -975,104 +972,6 @@ The Java Iterator interface does not provide an `add()` method for several impor
 
 [Back to Top](#table-of-contents)
 
-
-
-## How to synchronize ArrayList?
-
-ArrayList is not thread-safe by default. When multiple threads access an ArrayList concurrently, and at least one thread modifies it structurally, it must be synchronized externally. There are several ways to synchronize an ArrayList:
-
-* **Using Collections.synchronizedList() method**:
-  
-  ```java
-  import java.util.ArrayList;
-  import java.util.Collections;
-  import java.util.List;
-
-  public class SynchronizedArrayListExample {
-      public static void main(String[] args) {
-          // Create a regular ArrayList
-          List<String> normalList = new ArrayList<>();
-          
-          // Create a synchronized ArrayList
-          List<String> synchronizedList = Collections.synchronizedList(new ArrayList<>());
-          
-          // Adding elements
-          synchronizedList.add("Element 1");
-          synchronizedList.add("Element 2");
-          
-          // Important: Iteration must be synchronized manually
-          synchronized(synchronizedList) {
-              for(String element : synchronizedList) {
-                  System.out.println(element);
-              }
-          }
-      }
-  }
-  ```
-
-* **Using CopyOnWriteArrayList**:
-  This is a thread-safe variant of ArrayList in which all mutative operations (add, set, etc.) are implemented by creating a fresh copy.
-
-  ```java
-  import java.util.concurrent.CopyOnWriteArrayList;
-  import java.util.List;
-
-  public class CopyOnWriteArrayListExample {
-      public static void main(String[] args) {
-          // Create a CopyOnWriteArrayList
-          List<String> threadSafeList = new CopyOnWriteArrayList<>();
-          
-          // Adding elements
-          threadSafeList.add("Element 1");
-          threadSafeList.add("Element 2");
-          
-          // No need to synchronize iteration
-          for(String element : threadSafeList) {
-              System.out.println(element);
-          }
-      }
-  }
-  ```
-
-* **Using explicit synchronization blocks**:
-
-  ```java
-  import java.util.ArrayList;
-  import java.util.List;
-
-  public class ExplicitSynchronizationExample {
-      private final List<String> list = new ArrayList<>();
-      private final Object lock = new Object();
-      
-      public void addElement(String element) {
-          synchronized(lock) {
-              list.add(element);
-          }
-      }
-      
-      public String getElement(int index) {
-          synchronized(lock) {
-              return list.get(index);
-          }
-      }
-      
-      public void iterateList() {
-          synchronized(lock) {
-              for(String element : list) {
-                  System.out.println(element);
-              }
-          }
-      }
-  }
-  ```
-
-**Important considerations**:
-- The `Collections.synchronizedList()` wrapper only synchronizes individual operations, not compound operations.
-- When iterating over a synchronized collection, you must manually synchronize the iteration.
-- `CopyOnWriteArrayList` is better for read-heavy scenarios with few modifications.
-- Explicit synchronization gives you more control but requires careful implementation.
-
-[Back to Top](#table-of-contents)
 
 ## What is EnumMap in Java?
 

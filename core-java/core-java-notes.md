@@ -338,6 +338,55 @@ public class Main {
    - Affects performance due to lock acquisition overhead
    - Reentrancy: a thread can acquire the same lock multiple times
    - Not inherited in subclass method overrides (must be explicitly declared)
+## Multithreading
+
+### Thread Creation
+1. Extend `Thread` class or implement `Runnable` interface
+2. Can't restart a thread once it has completed execution
+3. Thread priorities are hints to the scheduler, not guarantees
+4. Daemon threads are terminated when all user threads complete
+5. `Thread.sleep()` keeps lock ownership but pauses execution
+6. `Thread.join()` makes the current thread wait for another thread to die
+7. Thread names should be unique for debugging
+8. Thread groups are mostly obsolete
+
+### Thread Safety
+1. Always synchronize access to mutable shared data
+2. Avoid unnecessary synchronization for better performance
+3. Immutable objects are inherently thread-safe
+4. Thread-local variables provide per-thread isolated storage
+5. Volatile ensures visibility but doesn't guarantee atomicity
+6. CAS (Compare-And-Swap) operations can avoid locking
+7. High-level concurrency utilities preferred over raw synchronization
+
+### Locks and Conditions
+1. `ReentrantLock` provides same behavior as synchronized, plus additional features
+2. Must explicitly unlock in finally blocks
+3. `ReadWriteLock` allows concurrent reads but exclusive writes
+4. Lock fairness setting determines if longest-waiting thread gets lock first
+5. `Condition` objects can provide more fine-grained waiting/signaling
+6. `tryLock()` attempts to get lock without blocking
+7. `lockInterruptibly()` allows lock acquisition to be interrupted
+
+### Executors Framework
+1. Prefer executors over creating threads directly
+2. Thread pools reuse threads to reduce overhead
+3. `newFixedThreadPool` creates a fixed-size thread pool
+4. `newCachedThreadPool` creates threads as needed, reuses idle threads
+5. `newSingleThreadExecutor` guarantees sequential execution
+6. `ScheduledExecutorService` handles delayed and periodic tasks
+7. Always shut down executor services explicitly
+8. Handle uncaught exceptions via `UncaughtExceptionHandler`
+
+### Concurrent Collections
+1. Thread-safe without external synchronization
+2. `ConcurrentHashMap` provides better concurrency than `Hashtable`
+3. `CopyOnWriteArrayList` optimizes for read-heavy scenarios
+4. `BlockingQueue` supports producer-consumer pattern
+5. `ConcurrentSkipListMap` is a concurrent sorted map
+6. May not reflect the latest state of other threads
+7. Size-related operations (size, isEmpty) may not be accurate in concurrent contexts
+8. Iteration doesn't throw `ConcurrentModificationException`
 
 ## Exceptions
 
@@ -440,56 +489,6 @@ I can definitely provide similar rule sets for other core Java concepts. Here ar
 6. `orElseGet()` is lazy; `orElse()` always evaluates its argument
 7. `map()` transforms value if present, `flatMap()` for when the transformation returns an Optional
 8. Cannot be serialized
-
-## Multithreading
-
-### Thread Creation
-1. Extend `Thread` class or implement `Runnable` interface
-2. Can't restart a thread once it has completed execution
-3. Thread priorities are hints to the scheduler, not guarantees
-4. Daemon threads are terminated when all user threads complete
-5. `Thread.sleep()` keeps lock ownership but pauses execution
-6. `Thread.join()` makes the current thread wait for another thread to die
-7. Thread names should be unique for debugging
-8. Thread groups are mostly obsolete
-
-### Thread Safety
-1. Always synchronize access to mutable shared data
-2. Avoid unnecessary synchronization for better performance
-3. Immutable objects are inherently thread-safe
-4. Thread-local variables provide per-thread isolated storage
-5. Volatile ensures visibility but doesn't guarantee atomicity
-6. CAS (Compare-And-Swap) operations can avoid locking
-7. High-level concurrency utilities preferred over raw synchronization
-
-### Locks and Conditions
-1. `ReentrantLock` provides same behavior as synchronized, plus additional features
-2. Must explicitly unlock in finally blocks
-3. `ReadWriteLock` allows concurrent reads but exclusive writes
-4. Lock fairness setting determines if longest-waiting thread gets lock first
-5. `Condition` objects can provide more fine-grained waiting/signaling
-6. `tryLock()` attempts to get lock without blocking
-7. `lockInterruptibly()` allows lock acquisition to be interrupted
-
-### Executors Framework
-1. Prefer executors over creating threads directly
-2. Thread pools reuse threads to reduce overhead
-3. `newFixedThreadPool` creates a fixed-size thread pool
-4. `newCachedThreadPool` creates threads as needed, reuses idle threads
-5. `newSingleThreadExecutor` guarantees sequential execution
-6. `ScheduledExecutorService` handles delayed and periodic tasks
-7. Always shut down executor services explicitly
-8. Handle uncaught exceptions via `UncaughtExceptionHandler`
-
-### Concurrent Collections
-1. Thread-safe without external synchronization
-2. `ConcurrentHashMap` provides better concurrency than `Hashtable`
-3. `CopyOnWriteArrayList` optimizes for read-heavy scenarios
-4. `BlockingQueue` supports producer-consumer pattern
-5. `ConcurrentSkipListMap` is a concurrent sorted map
-6. May not reflect the latest state of other threads
-7. Size-related operations (size, isEmpty) may not be accurate in concurrent contexts
-8. Iteration doesn't throw `ConcurrentModificationException`
 
 ## Advanced Exception Handling
 
@@ -724,9 +723,11 @@ Here are more essential Java concepts and their rules:
     - Guards in patterns (when clause)
     - Record patterns and deconstruction
 
+<br/><br/>
 
 
-## Serialization and Deserialization
+### Serialization and Deserialization
+---
 
 ### What is Serialization and Deserialization?
 
