@@ -198,6 +198,17 @@ public class CompositionDemo {
 | Example      | Student ↔ School     | Department → Professor        | House → Room                     |
 
 ---
+## Comparison between is-a & has-a Relationship
+
+| Feature            | is-a Relationship         | has-a Relationship             |
+| ------------------ | ------------------------- | ------------------------------ |
+| Concept            | Inheritance               | Composition/Aggregation        |
+| Implementation     | `extends` / `implements`  | Class references another class |
+| Relationship       | Child is a type of Parent | One class contains another     |
+| Example            | Dog **is an** Animal      | Car **has a** Engine           |
+| Design Flexibility | Less flexible             | More flexible                  |
+
+---
 
 
 

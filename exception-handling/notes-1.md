@@ -534,6 +534,18 @@ try {
 }
 ```
 
+### Comparision between different methods to print/log exception details 
+
+| **Method**              | **Description**                                                                                                                       | **Output Example**                                                                            | **Output**                 | **Includes Stack Trace?** | **Usefulness** | **Notes**                                       | **When to Use**                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------- | ------------------------- | -------------- | ----------------------------------------------- | ------------------------------------ |
+| `printStackTrace()`     | Prints the stack trace of the exception to the **standard error stream**. Provides details like class, file, method, and line number. | Exception in thread "main" java.lang.ArithmeticException: / by zero at Main.main(Main.java:5) | Full stack trace to stderr | ✅ Yes                     | Very High      | Shows complete stack trace for debugging.       | Use during development to debug.     |
+| `toString()`            | Returns a string with the exception class name and message.                                                                           | java.lang.ArithmeticException: / by zero                                                      | ExceptionClass: message    | ❌ No                      | Medium         | Quick, readable exception summary.              | Good for logging, not user display.  |
+| `getMessage()`          | Returns only the error message.                                                                                                       | / by zero                                                                                     | Message only               | ❌ No                      | Low            | Simple message text only.                       | For user-friendly error messages.    |
+| `getCause()`            | Returns the underlying cause of the exception, if present.                                                                            | java.lang.NullPointerException: Cause of the exception                                        | Cause of exception         | ❌ Partial                 | Medium         | Helps trace nested exceptions.                  | When analyzing wrapped exceptions.   |
+| `getStackTrace()`       | Returns an array of stack trace elements (class, method, line number).                                                                | \[Ljava.lang.StackTraceElement;@15db9742                                                      | Stack trace as array       | Partial                   | Medium         | Raw stack trace data, needs formatting.         | When manually logging or formatting. |
+| `getLocalizedMessage()` | Returns a localized message if supported by the exception.                                                                            | Arithmetic error occurred (localized message)                                                 | Localized error message    | ❌ No                      | Low-Medium     | Provides message in user's locale if supported. | For internationalized applications.  |
+
+---
 ## 5. EXCEPTION HANDLING AND INHERITANCE
 
 ### Exception Handling in Method Overriding

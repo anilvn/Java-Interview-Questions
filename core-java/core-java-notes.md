@@ -1,5 +1,5 @@
 # Java Rules: Abstract Classes, Interfaces, Polymorphism, and More
-| #   | Question Text                                                                                     |
+<!-- | #   | Question Text                                                                                     |
 |-----|---------------------------------------------------------------------------------------------------|
 | **Abstract Classes**                                                                                   |
 | 1   | [What is an abstract class and how is it declared?](#abstract-classes)                           |
@@ -82,7 +82,7 @@
 | 58  | [What are the common garbage collection algorithms in Java?](#garbage-collection)              |
 | **Java 9+ Features**                                                                                 |
 | 59  | [What is the Java Module System and its features?](#java-9-features)                           |
-| 60  | [What are the new features introduced in Java 9 and later versions?](#java-9-features)         |
+| 60  | [What are the new features introduced in Java 9 and later versions?](#java-9-features)         | -->
 
 ## Abstract Classes
 
@@ -482,6 +482,19 @@ public class Main {
 ```
 </details>
 
+## volatile keyword
+
+1. **Ensures visibility** of changes to a variable across **multiple threads**
+2. Tells the JVM **not to cache the value** of the variable in threads' local memory
+3. Guarantees **read/write goes directly to and from main memory**
+4. Applied **only to instance variables** (not methods, classes, or local variables)
+5. **Does not guarantee atomicity** — operations like `i++` are **not** thread-safe even if `i` is volatile
+6. Can **prevent instruction reordering** (useful in implementing safe singleton patterns)
+7. Commonly used in **double-checked locking** and **flags** (e.g., stopping a thread)
+8. **Not a replacement for synchronized** — use it only when **atomicity is not required**
+9. Helps **avoid stale data issues** in multi-threaded applications
+10. Cannot be used with `final` (as final means constant and can't change, while volatile is about change visibility)
+
 ## transient keyword
 
 1. Used to indicate that a field should not be serialized
@@ -496,6 +509,7 @@ public class Main {
 10. Custom serialization can still manually serialize transient fields if needed
 
 
+
 <details>
 <summary>serialize transient fields using Custom serialization</summary>
 
@@ -504,6 +518,25 @@ public class Main {
 * Inside these methods, you tell Java how to save and load the transient fields manually.
 * This way, you control how the transient data is stored and restored.
 </details>
+
+
+
+## Comparison between Mutable vs Immutable Classes in Java
+
+| Aspect                | Mutable Class                                            | Immutable Class                                                 |
+| --------------------- | -------------------------------------------------------- | --------------------------------------------------------------- |
+| **Definition**        | Object whose state **can be changed** after creation     | Object whose state **cannot be changed** after creation         |
+| **Class Declaration** | Regular class                                            | Declared as `final` to prevent subclassing                      |
+| **Field Declaration** | `private`, **non-final**                                 | `private final`                                                 |
+| **Setters**           | ✅ Provided — used to modify fields                       | ❌ Not provided — no way to change internal state                |
+| **Getters**           | ✅ Can expose direct fields (including mutable objects)   | ✅ Provided, but return **defensive copies** if field is mutable |
+| **Constructor**       | Used to initialize fields, but values can change later   | All fields initialized once via constructor                     |
+| **Thread Safety**     | ❌ Not thread-safe (must handle manually)                 | ✅ Thread-safe (due to immutability)                             |
+| **Use Cases**         | When object state needs to change over time (e.g., DTOs) | For constants, safe sharing in concurrent environments          |
+| **Example Classes**   | `StringBuilder`, `ArrayList`, `HashMap`, custom beans    | `String`, `Integer`, `LocalDate`, custom immutable classes      |
+
+---
+
 
 ## synchronized keyword
 

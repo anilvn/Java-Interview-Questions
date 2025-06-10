@@ -73,28 +73,24 @@ Feel free to star and fork these repositories if you find them useful!
 
 Here are various ways to create a stream:
 
-* ***Create an empty stream.***
+* ***Differnt ways to create a Stream.***
     ```java
     import java.util.stream.Stream;
     // ... other necessary imports
 
-    Stream<String> emptyStream = Stream.empty();
-    ```
-
-* ***Create a stream with a single element.***
-    ```java
-    Stream<String> singleElementStream = Stream.of("apple");
-    ```
-
-* ***Create a stream from a value that might be null (becomes empty stream if null).***
-    ```java
+    Stream<String> emptyStream = Stream.empty();  // Create an empty stream.
+    Stream<String> singleElementStream = Stream.of("apple");  // Create a stream with a single element.
+    Stream<String> multiElementStream = Stream.of("apple", "banana", "cherry"); // Create a stream from multiple elements.
+    
+    // Create a stream from a value that might be null (becomes empty stream if null).
     Stream<String> nullableStream = Stream.ofNullable(null); // Empty
     Stream<String> valueStream = Stream.ofNullable("value"); // Stream with "value"
-    ```
 
-* ***Create a stream from multiple elements.***
-    ```java
-    Stream<String> multiElementStream = Stream.of("apple", "banana", "cherry");
+    // Concatenate two existing streams.
+    Stream<String> stream1 = Stream.of("apple", "banana");
+    Stream<String> stream2 = Stream.of("cherry", "date");
+    Stream<String> concatenatedStream = Stream.concat(stream1, stream2);
+    // Result: Stream containing ["apple", "banana", "cherry", "date"]
     ```
 
 * ***Create a stream from an existing array.***
@@ -126,6 +122,21 @@ Here are various ways to create a stream:
     ```java
     Stream<Integer> boundedIteratedStream = Stream.iterate(1, n -> n < 10, n -> n + 2);
     // Result: Stream containing [1, 3, 5, 7, 9]
+             // Creates a stream: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90
+    
+    Stream<Integer> boundedIteratedStream = Stream.iterate(0, n -> n < 100, n -> n + 10)
+            .skip(5) // Skips first 5 elements: 0, 10, 20, 30, 40, Remaining : 50, 60, 70, 80, 90
+            .limit(3) // Limits to next 3 elements: 50, 60, 70
+            .filter(n -> n % 10 == 0); // Keeps only values divisible by 10 — all pass: 50, 60, 70
+
+        // Print the final elements in the stream
+        boundedIteratedStream.forEach(System.out::println);
+        /*
+         * Output:
+         * 50
+         * 60
+         * 70
+         */
     ```
 
 * ***Create an infinite sequential unordered stream using a Supplier (often limited).***
@@ -133,16 +144,6 @@ Here are various ways to create a stream:
     Stream<Double> generatedStream = Stream.generate(Math::random).limit(3);
     // Result: Stream containing 3 random doubles
     ```
-
-* ***Concatenate two existing streams.***
-    ```java
-    Stream<String> stream1 = Stream.of("apple", "banana");
-    Stream<String> stream2 = Stream.of("cherry", "date");
-    Stream<String> concatenatedStream = Stream.concat(stream1, stream2);
-    // Result: Stream containing ["apple", "banana", "cherry", "date"]
-    ```
-
----
 
 ## ✨ Intermediate Operations Examples ✨
 
@@ -389,6 +390,19 @@ Here are various ways to create a stream:
                                        .reduce(0, Integer::sum); // Identity = 0
     System.out.println("reduce (Identity): " + sumWithIdentity);
     // Output: 15
+
+    // Step-by-step stream processing to compute sum of specific elements
+    // Creates a stream: 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, ..., 95
+    int sumOfFilteredElements = Stream.iterate(0, n -> n < 100, n -> n + 5)
+            .skip(10) // Skips first 10 elements: 0-45, Remaining stream: 50-95
+            .limit(5) // Takes next 5 elements only: 50, 55, 60, 65, 70
+            .filter(n -> n % 10 == 0) // Filters only those divisible by 10: 50, 60, 70
+            .reduce(0, Integer::sum); // Reduces (sums up) the filtered values: 50 + 60 + 70 = 180
+    System.out.println("Sum of filtered values: " + sumOfFilteredElements);
+    /*
+     * Output:
+     * Sum of filtered values: 180
+     */
     ```
 
 * ***Combines stream elements using identity, accumulator, and combiner (calculates total length of names, parallel-safe).***
@@ -596,103 +610,3 @@ Here are various ways to create a stream:
     ```
 
 ---
-<!-- 
-## 🏢 Comprehensive Example: Employee Operations
-
-This example demonstrates various stream operations on a list of `Employee` objects.
-
-```java
-import java.util.*;
-import java.util.stream.Collectors;
-
-// Employee class definition (as provided before) ...
-
-public class EmployeeOperations {
-    public static void main(String[] args) {
-        List<Employee> employees = Arrays.asList(
-            // ... employee data as provided before ...
-            new Employee("Alice", 30, "Female", 50000, "New York", "IT", true),
-            new Employee("Bob", 25, "Male", 60000, "San Francisco", "Finance", false),
-            new Employee("Charlie", 35, "Male", 55000, "New York", "Marketing", true),
-            new Employee("David", 40, "Male", 70000, "San Francisco", "IT", true),
-            new Employee("Emma", 28, "Female", 75000, "Los Angeles", "HR", false),
-            new Employee("Frank", 35, "Male", 55000, "New York", "IT", true)
-        );
-
-        System.out.println("--- Employee Operations ---");
-
-        // 1. filter: Filters females
-        System.out.println("\n1. Females:");
-        employees.stream()
-                 .filter(emp -> emp.getGender().equals("Female"))
-                 .forEach(System.out::println); // Using forEach for direct output
-        System.out.println("---");
-
-        // 2. map: Get employee names
-        System.out.println("\n2. Employee Names:");
-        employees.stream()
-                 .map(Employee::getName)
-                 .forEach(System.out::println);
-        System.out.println("---");
-
-        // 3. flatMap & distinct: Get unique words from city names
-        System.out.println("\n3. Unique Words in City Names:");
-         employees.stream()
-                  .map(Employee::getCity)
-                  .flatMap(city -> Arrays.stream(city.split(" ")))
-                  .distinct()
-                  .forEach(System.out::println);
-         System.out.println("---");
-
-        // 4. map & distinct: Get unique department names
-        System.out.println("\n4. Unique Department Names:");
-        employees.stream()
-                 .map(Employee::getDeptName)
-                 .distinct()
-                 .forEach(System.out::println);
-        System.out.println("---");
-
-        // 5. sorted: Sort employees by salary (ascending)
-        System.out.println("\n5. Employees sorted by salary:");
-        employees.stream()
-                 .sorted(Comparator.comparingDouble(Employee::getSalary))
-                 .forEach(System.out::println);
-        System.out.println("---");
-
-        // 6. sorted, reversed, limit: Get top 3 highest paid employees
-        System.out.println("\n6. Top 3 highest paid employees:");
-        employees.stream()
-                 .sorted(Comparator.comparingDouble(Employee::getSalary).reversed())
-                 .limit(3)
-                 .forEach(System.out::println);
-        System.out.println("---");
-
-        // 7. sorted, reversed, skip: Get employees *after* the top 3 highest paid
-        System.out.println("\n7. Employees after top 3 highest paid:");
-        employees.stream()
-                 .sorted(Comparator.comparingDouble(Employee::getSalary).reversed())
-                 .skip(3)
-                 .forEach(System.out::println);
-        System.out.println("---");
-
-        // 8. peek: Log names during filtering (Debugging example)
-        System.out.println("\n8. Peeking at names while finding active IT employees:");
-        List<Employee> activeITEmployees = employees.stream()
-            .filter(emp -> emp.getDeptName().equals("IT"))
-            .peek(emp -> System.out.println("Checking IT employee: " + emp.getName())) // Debug peek
-            .filter(Employee::isActiveEmp)
-            .collect(Collectors.toList()); // Collect results
-        System.out.println("Active IT Employees found ("+ activeITEmployees.size() +"):");
-        activeITEmployees.forEach(System.out::println);
-        System.out.println("---");
-
-        // Correct way to give a 10% raise (using map)
-        System.out.println("\nGiving a 10% raise (using map - creates new objects):");
-        List<Employee> employeesWithRaise = employees.stream()
-            .map(emp -> new Employee(emp.getName(), emp.getAge(), emp.getGender(),
-                                    emp.getSalary() * 1.10, emp.getCity(),
-                                    emp.getDeptName(), emp.isActiveEmp()))
-            .collect(Collectors.toList());
-        employeesWithRaise.forEach(System.out::println);
-    }
-} -->

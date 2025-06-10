@@ -121,6 +121,7 @@ Feel free to star and fork these repositories if you find them useful!
     ```java
     System.out.println("\n--- Iterating with forEach + Method Reference ---");
     employeeList.forEach(System.out::println);
+    // employeeList.stream().forEach(System.out::println);
     ```
 
 * _Iterating using a Stream and `forEach` (equivalent to list's `forEach`)._
@@ -141,9 +142,13 @@ Feel free to star and fork these repositories if you find them useful!
 
     System.out.println("\n--- Collecting Employee Names ---");
     List<String> employeeNames = employeeList.stream()
-                                          .map(Employee::getName) // Method reference for getter
-                                          // .map(emp -> emp.getName()) // Equivalent lambda
-                                          .collect(Collectors.toList());
+                                      .map(Employee::getName) // Method reference for getter
+                                   // .map(emp -> emp.getName()) // Equivalent lambda
+                                      .collect(Collectors.toList());
+                                   // .filter(x -> x!=null)
+                                  //  .filter(x -> x.startWith('a'))
+                                 //   .filter(name -> name != null && name.length() > 3)
+                                //    .filter(name -> name != null && name.toLowerCase().startsWith("r"))
     System.out.println(employeeNames);
     ```
     > _Output: `[Alice, Bob, Charlie, David, Emma, Frank, Grace]`_
@@ -151,9 +156,18 @@ Feel free to star and fork these repositories if you find them useful!
 * _Filter employees older than 30._
     ```java
     System.out.println("\n--- Filtering Employees Older Than 30 ---");
+    // works good with the primitive type --  emp.getAge(),if it is Integer -- NullPointerException
     List<Employee> olderEmployees = employeeList.stream()
-                                             .filter(emp -> emp.getAge() > 30)
-                                             .collect(Collectors.toList());
+                                         .filter(emp -> emp.getAge() > 30)
+                                         .collect(Collectors.toList());      
+    List<Employee> olderEmployees = employeeList.stream()
+                                         .filter(emp-> emp.getAge()!=null && emp -> emp.getAge() > 30)
+                                         .collect(Collectors.toList());                             
+    List<Employee> olderEmployees = employeeList.stream()
+                                        .filter(emp -> {
+                                            return emp.getAge() != null && emp.getAge() > 30;
+                                        }).collect(Collectors.toList()); 
+
     olderEmployees.forEach(System.out::println);
     ```
     > _Output: Includes Charlie, David, Frank_
@@ -181,15 +195,22 @@ Feel free to star and fork these repositories if you find them useful!
     <br/>
 * _Store unique employee objs._
     ```java
+     // approach - 1
     Set<Employee> uniqueEmployees = employeeList.stream()
-        .collect(Collectors.toMap(
-            e -> e.getId(),            // Use employee ID as key
-            Function.identity(),       // Value: Employee object
-            (e1, e2) -> e1             // If duplicate key (same ID), keep first
-        ))
-        .values()
-        .stream()
-        .collect(Collectors.toSet());
+                .collect(Collectors.toMap(
+                                e -> e.getId(),            // Use employee ID as key
+                                Function.identity(),       // Value: Employee object
+                                (e1, e2) -> e1             // If duplicate key (same ID), keep first
+                )).values()
+                  .stream()
+                  .collect(Collectors.toSet());
+
+    // approach - 2
+    Set<Long> seen = new HashSet<>();
+    Set<Employee> uniqueEmployees = employeeList.stream()
+                        .filter(e -> seen.add(e.getId()))  // returns false for duplicates
+                        .collect(Collectors.toSet());
+
     ```
 
 * _Store unique employee objs on the basis of -(key,value)._
@@ -415,11 +436,28 @@ Feel free to star and fork these repositories if you find them useful!
 
 * _Find the Employee with the Maximum Salary._
     ```java
-    System.out.println("\n--- Employee with Maximum Salary ---");
     Optional<Employee> highestPaidEmployee = employeeList.stream()
-        .collect(Collectors.maxBy(Comparator.comparingDouble(Employee::getSalary)));
-        // Alternatively: .max(Comparator.comparingDouble(Employee::getSalary));
+            .collect(Collectors.maxBy(Comparator.comparingDouble(Employee::getSalary)));
     highestPaidEmployee.ifPresent(System.out::println);
+    // Prints: Optional[Employee{id=2, name='Jane', salary=85000.0}]
+    
+    Optional<Double> maxSalary = employeeList.stream()
+            .map(Employee::getSalary)
+            .collect(Collectors.maxBy(Double::compareTo));
+    // Prints: Optional[85000.0]
+    
+    /*
+        Optional<T> max(Comparator<? super T> comparator)
+        - Stream<T> is in the package: java.util.stream
+    */
+    Optional<Employee> highestPaidEmployee = employeeList.stream()
+            .max(Comparator.comparingDouble(Employee::getSalary));
+    // Prints: Optional[Employee{id=2, name='Jane', salary=85000.0}]
+    
+    Optional<Double> maxSalary = employeeList.stream()
+            .map(Employee::getSalary)
+            .max(Double::compareTo);
+    // Prints: Optional[85000.0]
     ```
     > _Output: Emma's record_
 
@@ -443,19 +481,18 @@ Feel free to star and fork these repositories if you find them useful!
     //  .mapToDouble(Employee::getSalary) // Convert to DoubleStream - for the salaryStats
         .summaryStatistics(); // Calculate stats
 
-    System.out.println("Count: " + ageStats.getCount());
-    System.out.println("Sum: " + ageStats.getSum());
     System.out.println("Min: " + ageStats.getMin());
-    System.out.println("Average: " + ageStats.getAverage());
     System.out.println("Max: " + ageStats.getMax());
+    System.out.println("Sum: " + ageStats.getSum());
+    System.out.println("Average: " + ageStats.getAverage());
+    System.out.println("Count: " + ageStats.getCount());
     ```
     > _Output:_
-    > _Count: 7_
-    > _Sum: 221_
     > _Min: 25_
-    > _Average: 31.57..._
     > _Max: 40_
-
+    > _Sum: 221_
+    > _Average: 31.57..._
+    > _Count: 7_
 
 * _Find the Highest Salary in each Department._
     ```java
