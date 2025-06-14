@@ -144,6 +144,7 @@ Feel free to star and fork these repositories if you find them useful!
     List<String> employeeNames = employeeList.stream()
                                       .map(Employee::getName) // Method reference for getter
                                    // .map(emp -> emp.getName()) // Equivalent lambda
+                        //  .map(emp -> emp.getFirstName()+" "emp.getLastName()) 
                                       .collect(Collectors.toList());
                                    // .filter(x -> x!=null)
                                   //  .filter(x -> x.startWith('a'))
@@ -287,8 +288,35 @@ Feel free to star and fork these repositories if you find them useful!
     > _Finance: 1_
     > _Marketing: 1_
     > _IT: 4_
+    
 
+* _Total salaries grouped by department._
+    ```java
+        // 1. Total salary of all employees
+        double totalSalary = empList.stream()
+            .map(Employee::getSalary)
+            .reduce(0.0, Double::sum);
+        System.out.println("Total Salary of All Employees: " + totalSalary);
 
+        // 2. Total salaries grouped by department
+        Map<String, Double> totalSalariesByDept = empList.stream()
+            .collect(Collectors.groupingBy(
+                Employee::getDepartment,
+                Collectors.reducing(0.0, Employee::getSalary, Double::sum)
+            ));
+
+        System.out.println("Total Salaries by Department:");
+        totalSalariesByDept.forEach((dept, total) ->
+            System.out.println(dept + " → " + total)
+        );
+    ```
+    ```
+    Total Salary of All Employees: 237000.0
+    Total Salaries by Department:
+    HR → 105000.0
+    IT → 122000.0
+    Finance → 70000.0
+    ```
 ---
 
 ### 📊 Sorting Employees

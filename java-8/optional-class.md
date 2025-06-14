@@ -352,3 +352,20 @@ public class EmployeeController {
     }
 }
 ```
+
+
+```java
+public int getMathScore(Student student) {
+    return Optional.ofNullable(student)
+            .map(Student::getMarks)
+            .map(m -> m.get("Math"))
+            .orElse(0);
+}
+public String getStatusCode(ApiResponse response) {
+    return Optional.ofNullable(response)
+            .map(ApiResponse::getMetadata)
+            .map(Metadata::getStatusCode)
+            .map(String::valueOf)
+            .orElse("N/A");
+}
+```
