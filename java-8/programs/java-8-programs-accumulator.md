@@ -307,18 +307,36 @@ System.out.println(threadSafeWordCounter(lines));
 
 ### 4. Using `TreeMap` with Custom Sorting – Rank Students by Score Descending
 
-```java
-public static Map<String, Integer> rankStudentsDescending(Map<String, Integer> scores) {
-    return scores.entrySet().stream()
-        .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder()))
-        .collect(Collectors.toMap(
-            Map.Entry::getKey,
-            Map.Entry::getValue,
-            (a, b) -> b,
-            LinkedHashMap::new
-        ));
-}
+#### **Ranking Students by Exam Scores**
 
+**Scenario:** In an online education app, after students take a quiz, you want to show a **leaderboard**.
+
+```java
+Map<String, Integer> scores = Map.of(
+    "Alice", 85,
+    "Bob", 92,
+    "Charlie", 78,
+    "David", 92
+);
+
+Map<String, Integer> ranked = scores.entrySet().stream()
+    .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder()))
+    .collect(Collectors.toMap(
+        Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
+
+System.out.println(ranked);
+```
+
+**Output:**
+
+```
+Bob=92
+David=92
+Alice=85
+Charlie=78
+```
+
+```java
 // Alternative: Grouping products by date with TreeMap for sorted dates
 Map<LocalDate, List<Product>> grouped = productsList.stream()
     .collect(Collectors.groupingBy(

@@ -31,6 +31,14 @@ public class FirstNonRepeatedChar {
 
 ```
 
+```
+Collectors.groupingBy(
+    classifierFunction,
+    mapFactory,
+    downstreamCollector
+)
+```
+
 - approach-2 
 ```java
         // 1. Count character frequencies and maintain insertion order
@@ -58,7 +66,8 @@ public class FirstNonRepeatedChar {
         Map<Character, Integer> charCounts = input.chars()
                 .mapToObj(c -> (char) c)
                 .collect(
-                        LinkedHashMap::new,  //  () ->  new LinkedHashMap<Character, Integer>(),
+                        LinkedHashMap::new,  //  () ->  new LinkedHashMap<Character, Integer>(),  ]
+                        // new TreeMap<>(Comparator.reverseOrder()
                         (map, ch) -> map.put(ch, map.getOrDefault(ch, 0) + 1),
                         Map::putAll   //(map1, map2) -> map1.putAll(map2)
                 );
@@ -74,11 +83,13 @@ public class FirstNonRepeatedChar {
     }
 
     //-equalent code for 3rd param - combiner
-    (map1, map2) -> {
-        for (Map.Entry<Character, Integer> entry : map2.entrySet()) {
-            map1.merge(entry.getKey(), entry.getValue(), Integer::sum);
-        }
-    }
+    /*
+     *   (map1, map2) -> {
+     *      for (Map.Entry<Character, Integer> entry : map2.entrySet()) {
+     *         map1.merge(entry.getKey(), entry.getValue(), Integer::sum);
+     *      }
+     *   }
+     */
 ```
  - accumulator internals
 ```java
