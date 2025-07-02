@@ -62,6 +62,18 @@ public static LinkedList<String> concatByFirstLetter(List<String> words) {
     );
 }
 
+public static StringBuilder concatByFirstLetter(List<String> words) {
+    return words.stream().collect(
+        StringBuilder::new,
+        (sb, word) -> {
+            String newName = word.charAt(0) + "-" + word;
+            sb.append(newName);
+        },
+        StringBuilder::append
+    );
+}
+
+
 // Sample call
 System.out.println(concatByFirstLetter(Arrays.asList("apple", "apricot", "banana", "blueberry")));
 ```
@@ -157,7 +169,23 @@ public static Map<String, Integer> mergeMaps(List<Map<String, Integer>> listOfMa
     // map.merge(key, value, (oldVal, newVal) -> oldVal + newVal);
     // Map.merge(k, v, remappingFunction) 
     // remappingFunction.apply(existingValue, newValue)
+    
 }
+```
+```java
+map.forEach((k, v) -> result.merge(k, v, Integer::sum)); // Summing values
+result.merge(k, v, (oldVal, newVal) -> Math.min(oldVal, newVal));
+result.merge(k, v, (oldVal, newVal) -> Math.max(oldVal, newVal));
+result.merge(k, v, Integer::min);
+
+result.merge(k, v, (oldVal, newVal) -> null); // Will remove the key
+result.merge(k, v, (oldVal, newVal) -> oldVal );
+result.merge(k, v, (oldVal, newVal) -> (oldVal + newVal) / 2);
+result.merge(k, v, (oldVal, newVal) -> oldVal + ", " + newVal);
+
+result.merge(k, v, (oldVal, newVal) -> {
+    throw new IllegalStateException("Duplicate key: " + k);
+});
 ```
 
 #### Version 2: Using flatMap and toMap
@@ -171,6 +199,18 @@ public static Map<String, Integer> mergeMaps(List<Map<String, Integer>> listOfMa
             Integer::sum
         ));
 }
+
+
+public static Map<String, Integer> mergeMaps(List<Map<String, Integer>> listOfMaps) {
+    return listOfMaps.stream()
+        .flatMap(map -> map.entrySet().stream())
+        .collect(Collectors.toMap(
+            entry -> entry.getKey(),            // lambda
+            entry -> entry.getValue(),          // lambda
+            (v1, v2) -> v1 + v2                 // lambda for Integer::sum
+        ));
+}
+
 ```
 
 **Sample call:**
@@ -208,6 +248,7 @@ public static Map<String, Double> sortedProductCatalog(List<Product> products) {
     return products.stream().collect(
         TreeMap::new, // Supplier: TreeMap keeps keys sorted
         (map, product) -> map.put(product.getName(), product.getPrice()), // Accumulator
+    //  (map, product) -> map.putIfAbsent(product.getName(), product.getPrice()), // Don't overwrite
         Map::putAll // Combiner
     );
 }
@@ -320,6 +361,7 @@ Map<String, Integer> scores = Map.of(
 );
 
 Map<String, Integer> ranked = scores.entrySet().stream()
+    // to compare by values, not on keys. 
     .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder()))
     .collect(Collectors.toMap(
         Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
@@ -369,3 +411,213 @@ System.out.println(rankStudentsDescending(students));
 - **ConcurrentHashMap**: Use for thread-safe operations in concurrent environments
 - **Custom Collectors**: Provide fine-grained control over collection operations
 - **Built-in Collectors**: Use when available (like `partitioningBy`, `groupingBy`) for cleaner code
+
+
+```java
+String removeDuplicateChars = Stream.of("a", "b", "a", "c")
+    .collect(
+        () -> {                    // ✅ supplier
+            System.out.println("Creating StringBuilder");
+            return new StringBuilder();
+        },
+        (sb, ch) -> {              // ❌ accumulator: no return
+            if (sb.indexOf(ch) == -1) {
+                sb.append(ch);
+            }
+        },
+        (sb1, sb2) -> {            // ✅ combiner: must return
+            sb1.append(sb2);
+            return sb1;
+        }
+    ).toString();
+
+
+
+public static String removeDuplicateChars(String input) {
+    Set<Character> seen = new HashSet<>();
+
+    StringBuilder result = input.chars()
+        .mapToObj(c -> (char) c)
+        .collect(
+            StringBuilder::new,                          // supplier
+            (sb, ch) -> {                                // accumulator
+                if (seen.add(ch)) sb.append(ch);
+            },
+            StringBuilder::append                        // combiner
+        );
+
+    return result.toString();
+}
+
+
+public static String removeDuplicateChars(String input) {
+    Set<Character> seen = new HashSet<>();
+    StringBuilder result = new StringBuilder();
+
+    input.chars()
+         .mapToObj(c -> (char) c)
+         .filter(seen::add) // only adds if not already in set
+         .forEach(result::append);
+
+    return result.toString();
+}
+
+
+public static String removeDuplicateChars(String input) {
+    return input.chars()
+        .mapToObj(c -> (char) c)
+        .collect(
+            Collector.of(
+                LinkedHashMap<Character, Boolean>::new, // supplier
+                (map, ch) -> map.putIfAbsent(ch, true), // accumulator
+                (map1, map2) -> {                       // combiner
+                    map2.forEach(map1::putIfAbsent);
+                    return map1;
+                },
+                map -> {                               // finisher
+                    StringBuilder sb = new StringBuilder();
+                    map.keySet().forEach(sb::append);
+                    return sb.toString();
+                }
+            )
+        );
+}
+```
+
+Absolutely! Let's explore more examples using **`Collector.of(...)` with a `finisher`**, which is useful when:
+
+* You want to **transform** the result into a different type (e.g., from `Map` to `String`)
+* You need **custom post-processing** (e.g., formatting, filtering, sorting)
+
+---
+
+## ✅ `Collector.of(...)` Structure Recap
+
+```java
+Collector.of(
+    Supplier<A>,                   // Creates mutable container
+    BiConsumer<A, T>,              // Accumulator
+    BinaryOperator<A>,             // Combiner
+    Function<A, R>                 // Finisher (returns final result)
+)
+```
+
+Now let's walk through some practical examples:
+
+---
+
+## 1️⃣ **Remove duplicate characters and return String**
+
+```java
+public static String removeDuplicateChars(String input) {
+    return input.chars()
+        .mapToObj(c -> (char) c)
+        .collect(
+            Collector.of(
+                LinkedHashSet::new,
+                Set::add,
+                (s1, s2) -> { s1.addAll(s2); return s1; },
+                set -> {
+                    StringBuilder sb = new StringBuilder();
+                    set.forEach(sb::append);
+                    return sb.toString();
+                }
+            )
+        );
+}
+```
+
+🧪 Output for `banana`: `"ban"`
+
+---
+
+## 2️⃣ **Group names by length and return a custom formatted string**
+
+```java
+public static String groupNamesByLength(List<String> names) {
+    return names.stream()
+        .collect(
+            Collector.of(
+                HashMap<Integer, List<String>>::new,
+                (map, name) -> map.computeIfAbsent(name.length(), k -> new ArrayList<>()).add(name),
+                (m1, m2) -> {
+                    m2.forEach((k, v) -> m1.merge(k, v, (l1, l2) -> { l1.addAll(l2); return l1; }));
+                    return m1;
+                },
+                map -> map.entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .collect(Collectors.joining(", "))
+            )
+        );
+}
+```
+
+🧪 Output for `["Tom", "Jerry", "Anna", "Bob"]`:
+
+```
+3=[Tom, Bob], 5=[Jerry], 4=[Anna]
+```
+
+---
+
+## 3️⃣ **Concatenate uppercase names in sorted order**
+
+```java
+public static String concatSortedUppercase(List<String> names) {
+    return names.stream()
+        .collect(
+            Collector.of(
+                ArrayList<String>::new,
+                List::add,
+                (l1, l2) -> { l1.addAll(l2); return l1; },
+                list -> list.stream()
+                            .map(String::toUpperCase)
+                            .sorted()
+                            .collect(Collectors.joining(", "))
+            )
+        );
+}
+```
+
+🧪 Input: `["john", "alice", "bob"]`
+🧪 Output: `"ALICE, BOB, JOHN"`
+
+---
+
+## 4️⃣ **Count character frequency and return a formatted string**
+
+```java
+public static String charFrequency(String input) {
+    return input.chars()
+        .mapToObj(c -> (char) c)
+        .collect(
+            Collector.of(
+                HashMap<Character, Integer>::new,
+                (map, ch) -> map.merge(ch, 1, Integer::sum),
+                (m1, m2) -> {
+                    m2.forEach((k, v) -> m1.merge(k, v, Integer::sum));
+                    return m1;
+                },
+                map -> map.entrySet().stream()
+                          .map(e -> e.getKey() + ":" + e.getValue())
+                          .collect(Collectors.joining(", "))
+            )
+        );
+}
+```
+
+🧪 Input: `"banana"`
+🧪 Output: `"b:1, a:3, n:2"`
+
+---
+
+## 🔁 Summary of Use-Cases for `finisher`
+
+| Use Case                     | Collection Container  | Finisher Output          |
+| ---------------------------- | --------------------- | ------------------------ |
+| Unique chars to `String`     | `Set<Character>`      | `StringBuilder → String` |
+| Grouping to formatted string | `Map<Integer, List>`  | `Map → String`           |
+| Sorting + formatting         | `List<String>`        | `String`                 |
+| Frequency map to string      | `Map<Character, Int>` | `String`                 |
+
+---

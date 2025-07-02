@@ -98,6 +98,52 @@
 10. Can implement interfaces
 11. A class can extend only one abstract class but implement multiple interfaces
 
+    - Abstract classes **can have instance variables**, and constructors help **initialize those variables**.
+
+    - Even though **you can’t instantiate** an abstract class directly, its **constructor is called when a concrete subclass is instantiated**.
+
+### 📌 Example:
+
+```java
+abstract class Animal {
+	int typeOfAnimal = "Animal"; // instance variable with direct initialization
+    String name;  // any access modfier -  (final also)
+
+    // static & Non-Static blocks for var initilization.
+    // static & Non-Static methods. - (private,final)
+
+    // Constructor in abstract class
+    Animal(String name) {
+        this.name = name;
+        System.out.println("Animal constructor called");
+    }
+}
+
+class Dog extends Animal {
+    Dog(String name) {
+        super(name);
+        System.out.println("Dog constructor called");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog("Buddy");
+    }
+}
+```
+
+### 🧾 Output:
+
+```
+Animal constructor called
+Dog constructor called
+```
+
+So, the constructor of the abstract class runs when the child class is created.
+
+---
+
 ## Interfaces
 
 1. All interface methods are implicitly `public` and `abstract` (before Java 8)
@@ -118,6 +164,22 @@
 <br/>
 
 - void m1(); non-static method un-implmented her in interface, can be implemented in class.
+
+```java
+interface Animal {
+    // Variables (implicitly public static final)
+    int AGE = 10;
+
+    // Static block ❌ Not allowed in interfaces
+    // Instance block ❌ Not allowed
+
+    // Static method & Default method (Java 8+)
+    // Private method (Java 9+)
+
+    // Abstract method 
+    void eat(); // non-static method
+}
+```
 
 #### Default Methods
 1. Defined in interfaces with the `default` keyword
@@ -961,11 +1023,11 @@ public class Main {
     - Guards in patterns (when clause)
     - Record patterns and deconstruction
 
-<br/><br/>
+<br/>
 
 
-### Serialization and Deserialization
----
+## Serialization and Deserialization
+
 
 ### What is Serialization and Deserialization?
 
@@ -1008,7 +1070,7 @@ Java provides various streams for handling byte and character data:
 | Classes (Examples)  | `FileInputStream`, `FileOutputStream`, `DataInputStream`, `DataOutputStream` | `FileReader`, `FileWriter`, `BufferedReader`, `BufferedWriter` |
 | Internal Conversion | None                             | Byte to character (encoding/decoding) |
 
-### Advantages and Disadvantages of FIS, FOS, DIS, DOS, OIS, OOS
+## Advantages and Disadvantages of FIS, FOS, DIS, DOS, OIS, OOS
 
 #### FileInputStream & FileOutputStream:
 

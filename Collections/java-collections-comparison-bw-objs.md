@@ -42,12 +42,12 @@ A comprehensive guide explaining the key differences between important interface
 
 **Collection** is an interface that forms the foundation of the Java Collections Framework, while **Collections** is a utility class that provides static methods for working with collections.
 
-### Collection Interface
+<!-- ### Collection Interface
 
 - **Collection** is a root interface in the collection hierarchy
 - It represents a group of objects known as elements
 - Interfaces like List, Set, and Queue extend the Collection interface
-- Defines basic operations like add(), remove(), contains(), etc.
+- Defines basic operations like add(), remove(), contains(), etc. -->
 
 ```java
 Collection<String> names = new ArrayList<>();
@@ -55,13 +55,13 @@ names.add("Alice");
 names.add("Bob");
 names.contains("Alice"); // returns true
 ```
-
+<!-- 
 ### Collections Utility Class
 
 - **Collections** is a utility class that contains only static methods
 - Provides methods to sort, search, shuffle, and synchronize collection elements
 - Cannot be instantiated as all methods are static
-- Includes algorithms that operate on Collection instances
+- Includes algorithms that operate on Collection instances -->
 
 ```java
 List<String> names = new ArrayList<>();
@@ -94,10 +94,10 @@ The Java Collections Framework provides two types of iterators that differ in ho
 
 ### Fail-Fast Iterators
 
-- Throw `ConcurrentModificationException` if the underlying collection is modified while iterating
+<!-- - Throw `ConcurrentModificationException` if the underlying collection is modified while iterating
 - Use a modification counter (`modCount`) to detect concurrent modifications
 - More efficient as they don't create a copy of the collection
-- Examples: Iterators from ArrayList, HashMap, HashSet, etc.
+- Examples: Iterators from ArrayList, HashMap, HashSet, etc. -->
 
 ```java
 List<String> list = new ArrayList<>();
@@ -115,10 +115,10 @@ while (iterator.hasNext()) {
 
 ### Fail-Safe Iterators
 
-- Do not throw exceptions when the underlying collection is modified during iteration
+<!-- - Do not throw exceptions when the underlying collection is modified during iteration
 - Work on a clone or snapshot of the original collection
 - Less efficient as they need to create a copy of the collection
-- Examples: Iterators from CopyOnWriteArrayList, ConcurrentHashMap, etc.
+- Examples: Iterators from CopyOnWriteArrayList, ConcurrentHashMap, etc. -->
 
 ```java
 CopyOnWriteArrayList<String> list = new CopyOnWriteArrayList<>();
@@ -144,6 +144,7 @@ while (iterator.hasNext()) {
 | More memory efficient | Less memory efficient |
 | Immediately detects modifications | May not reflect recent modifications |
 | Used by most non-concurrent collections | Used by concurrent collections |
+| Examples: Iterators from ArrayList, HashMap, HashSet, etc. |Examples: Iterators from CopyOnWriteArrayList, ConcurrentHashMap, etc.|
 
 [Back to Top](#table-of-contents)
 
@@ -1192,27 +1193,40 @@ System.out.println("idKey1 == idKey2: " + (idKey1 == idKey2)); // Output: false
 
 ```java
 // HashMap example
-Map<String, Integer> hashMap = new HashMap<>();
+HashMap<String, Integer> hashMap = new HashMap<>();
 hashMap.put("One", 1);
-hashMap.put("Two", 2);
-hashMap.put(null, 0);   // Legal in HashMap
-hashMap.put("Three", null);  // Legal in HashMap
+hashMap.put(null, 100);  // HashMap allows null keys
+hashMap.put("Null", null);  // HashMap allows null values
 
-System.out.println("HashMap: " + hashMap);
+// HashTable example
+Hashtable<String, Integer> hashTable = new Hashtable<>();
+hashTable.put("One", 1);
+// hashTable.put(null, 100);  // Would throw NullPointerException
+// hashTable.put("Null", null);  // Would throw NullPointerException
 
-// Hashtable example
-Map<String, Integer> hashtable = new Hashtable<>();
-hashtable.put("One", 1);
-hashtable.put("Two", 2);
-// hashtable.put(null, 0);   // Would throw NullPointerException
-// hashtable.put("Three", null);  // Would throw NullPointerException
+// Thread-safety demonstration
+// HashMap needs external synchronization for thread safety
+Map<String, Integer> threadSafeHashMap = Collections.synchronizedMap(new HashMap<>());
 
-System.out.println("Hashtable: " + hashtable);
+// Iterating over HashMap
+Iterator<String> hashMapIterator = hashMap.keySet().iterator();
+while (hashMapIterator.hasNext()) {
+    String key = hashMapIterator.next();
+    // Safe to modify hashMap here using iterator.remove()
+}
 
-// Thread safety demonstration
-Map<String, Integer> synchronizedHashMap = Collections.synchronizedMap(new HashMap<>());
-synchronizedHashMap.put("One", 1);
-synchronizedHashMap.put("Two", 2);
+// Iterating over Hashtable (both ways)
+// 1. Using Iterator
+Iterator<String> hashTableIterator = hashTable.keySet().iterator();
+while (hashTableIterator.hasNext()) {
+    String key = hashTableIterator.next();
+}
+
+// 2. Using legacy Enumeration
+Enumeration<String> keys = hashTable.keys();
+while (keys.hasMoreElements()) {
+    String key = keys.nextElement();
+}
 
 // Recommended alternative to Hashtable
 Map<String, Integer> concurrentHashMap = new ConcurrentHashMap<>();
@@ -1341,61 +1355,6 @@ concurrentHashMap.forEach(2, (key, value) ->
 
 // Parallel processing (Java 8+)
 int sum = concurrentHashMap.reduceValues(2, value -> value);
-```
-
-[Back to Top](#table-of-contents)
-
-## What is the difference between HashMap and HashTable?
-
-This question is essentially the same as question #6, but I'll provide a focused comparison table for clarity:
-
-| Feature | HashMap | HashTable |
-|---------|---------|-----------|
-| Thread safety | Not synchronized | Synchronized (thread-safe) |
-| Performance | Better (no synchronization overhead) | Slower due to synchronization |
-| Null support | Allows null keys and values | Does not allow null keys or values |
-| Iteration | Uses Iterator | Uses both Iterator and Enumeration |
-| Introduction | Java 1.2 | Java 1.0 (legacy class) |
-| Inheritance | Extends AbstractMap | Extends Dictionary |
-
-### Code Example:
-
-```java
-// HashMap example
-HashMap<String, Integer> hashMap = new HashMap<>();
-hashMap.put("One", 1);
-hashMap.put(null, 100);  // HashMap allows null keys
-hashMap.put("Null", null);  // HashMap allows null values
-
-// HashTable example
-Hashtable<String, Integer> hashTable = new Hashtable<>();
-hashTable.put("One", 1);
-// hashTable.put(null, 100);  // Would throw NullPointerException
-// hashTable.put("Null", null);  // Would throw NullPointerException
-
-// Thread-safety demonstration
-// HashMap needs external synchronization for thread safety
-Map<String, Integer> threadSafeHashMap = Collections.synchronizedMap(new HashMap<>());
-
-// Iterating over HashMap
-Iterator<String> hashMapIterator = hashMap.keySet().iterator();
-while (hashMapIterator.hasNext()) {
-    String key = hashMapIterator.next();
-    // Safe to modify hashMap here using iterator.remove()
-}
-
-// Iterating over Hashtable (both ways)
-// 1. Using Iterator
-Iterator<String> hashTableIterator = hashTable.keySet().iterator();
-while (hashTableIterator.hasNext()) {
-    String key = hashTableIterator.next();
-}
-
-// 2. Using legacy Enumeration
-Enumeration<String> keys = hashTable.keys();
-while (keys.hasMoreElements()) {
-    String key = keys.nextElement();
-}
 ```
 
 [Back to Top](#table-of-contents)

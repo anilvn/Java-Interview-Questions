@@ -8,7 +8,7 @@
 | 2   | [What is Aggregation in OOP?](#what-is-aggregation-in-oop)              |
 | 3   | [What is Composition in OOP?](#what-is-composition-in-oop)              |
 | 4   | [Differences between Association, Aggregation, and Composition](#differences-between-association-aggregation-and-composition) |
-| 5   | [Notes On Enum](#notes-on-enum)                                          |
+| 5   | [Differences between is-a & has-a relationship](#notes-on-enum)                                          |
 | 6   | [Java Abstraction, Interfaces, Inheritance & Diamond Problem](#java-abstraction-interfaces-inheritance--diamond-problem) |
 | 7   | [How are Abstraction and Loose Coupling Achieved?](#1-how-are-abstraction-and-loose-coupling-achieved) |
 | 8   | [What is the Use of Interfaces?](#2-what-is-the-use-of-interfaces) |

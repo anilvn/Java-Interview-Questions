@@ -226,6 +226,43 @@ Map<String, Double> avgAgeByGender = people.stream()
     ));
 
 System.out.println(avgAgeByGender);
+
+// ----------------------------
+        // First Approach: Step-by-step
+        // ----------------------------
+        Map<String, List<Person>> peopleByGender = people.stream()
+            .collect(Collectors.groupingBy(Person::gender));
+
+        Map<String, Double> avgAgeByGender1 = new HashMap<>();
+
+        for (Map.Entry<String, List<Person>> entry : peopleByGender.entrySet()) {
+            String gender = entry.getKey();
+            List<Person> group = entry.getValue();
+
+            int sum = group.stream().mapToInt(Person::age).sum();
+            int count = group.size();
+            double avg = sum / (double) count;
+
+            avgAgeByGender1.put(gender, avg);
+        }
+
+        System.out.println("Step-by-step approach: " + avgAgeByGender1);
+
+        // ----------------------------
+        // Second Approach: Using groupingBy + collectingAndThen
+        // ----------------------------
+        Map<String, Double> avgAgeByGender2 = people.stream()
+            .collect(Collectors.groupingBy(
+                Person::gender,
+                Collectors.collectingAndThen(
+                    Collectors.toList(),
+                    list -> {
+                        int sum = list.stream().mapToInt(Person::age).sum();
+                        int count = list.size();
+                        return sum / (double) count;
+                    }
+                )
+            ));
 ```
 
 📦 **Output**:

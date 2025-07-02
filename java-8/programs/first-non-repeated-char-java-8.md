@@ -23,6 +23,7 @@ public class FirstNonRepeatedChar {
         // 2. Find the first character with a count of 1
         return charCounts.entrySet().stream()
                 .filter(entry -> entry.getValue() == 1)
+            //  .filter(entry -> entry.getValue() > 1)  // for findFirstRepeatedChar
                 .map(LinkedHashMap.Entry::getKey)
                 .findFirst() // Get the first one that satisfies the condition
                 .orElse(null); // Return null if no non-repeated character is found

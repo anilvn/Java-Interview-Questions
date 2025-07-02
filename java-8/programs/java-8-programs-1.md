@@ -294,6 +294,7 @@ public class MinMaxInList {
                 .mapToInt(Integer::intValue)
                 .min()
                 .orElseThrow(() -> new IllegalStateException("No minimum value found"));
+
     }
 }
 ```
@@ -317,6 +318,7 @@ System.out.println("Average: " + stats.getAverage());
 System.out.println("Count: " + stats.getCount());
 System.out.println("Sum: " + stats.getSum());
 ```
+
 
 [Back to Top](#table-of-contents)
 
@@ -577,6 +579,7 @@ public class RemoveDuplicates {
         List<Integer> numbersWithDuplicates = Arrays.asList(1, 2, 3, 1, 4, 2, 5, 6, 3, 7);
         
         // Using Stream.distinct()
+        // standard way to remove duplicates while preserving order in a List.
         List<Integer> distinctNumbers = numbersWithDuplicates.stream()
                                                            .distinct()
                                                            .collect(Collectors.toList());
@@ -594,6 +597,18 @@ public class RemoveDuplicates {
         
         System.out.println("Original strings: " + stringsWithDuplicates);
         System.out.println("Distinct strings: " + distinctStrings);
+
+        // 1
+        Set<String> distinctSet = stringsWithDuplicates.stream()
+                                               .collect(Collectors.toSet());
+        // 2
+        Set<String> orderedSet = new LinkedHashSet<>(stringsWithDuplicates);
+        // 3
+        Set<String> orderedSet = stringsWithDuplicates.stream()
+                                              .collect(Collectors.toCollection(LinkedHashSet::new));
+
+
+
     }
 }
 ```
