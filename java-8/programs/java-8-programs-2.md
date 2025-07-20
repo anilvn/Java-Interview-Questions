@@ -108,3 +108,56 @@ System.out.println("Multi-collector: " + multi);
 - **Supplier**: Creates the container (e.g., `ArrayList::new`)
 - **Accumulator**: Adds elements to container (e.g., `List::add`)  
 - **Combiner**: Merges containers for parallel processing (e.g., `List::addAll`)
+
+
+<br/>
+<br/><br/>
+
+```java
+// Simple POJO representing a JobSeeker
+    class JobSeeker {
+        private String name;
+        private List<String> skills; 
+        // gettter, setter, constructors
+    }
+```
+```java
+// List of job seekers (some match more, some fewer skills)
+        List<JobSeeker> jobSeekers = List.of(
+            new JobSeeker("Alice", List.of("Java", "Spring", "Docker")),             // matches 3
+            new JobSeeker("Bob", List.of("Java", "Spring Boot")),                    // matches 1
+            new JobSeeker("Charlie", List.of("Java", "Spring", "Docker", "Angular")),// matches 4
+            new JobSeeker("David", List.of("C++", "Python"))                         // matches 0
+        );
+```
+
+```java
+        // List of required skills (size=5)
+        List<String> reqSkills = List.of("Java", "Spring", "Docker", "Angular", "SQL");
+
+        // jobseeker matched all skills- exact match.
+        List<JobSeeker> filtered = jobSeekers.stream()
+                .filter(js -> js.getSkills().containsAll(reqSkills))
+                .collect(Collectors.toList());
+```
+
+
+```java
+// Minimum number of matching skills required
+        int minMatchedSkills = 3;
+
+        // Filtering: keep candidates who have at least minMatchedSkills from reqSkills
+        List<JobSeeker> filtered = jobSeekers.stream()
+            .filter(js -> {
+                long matched = js.getSkills().stream()
+                        .filter(reqSkills::contains)
+                        .count();
+                return matched >= minMatchedSkills;
+            })
+            .collect(Collectors.toList());
+        
+        // Print the filtered candidates
+        System.out.println("Job seekers matching at least " + minMatchedSkills + " skills:");
+        filtered.forEach(js -> System.out.println(js.getName() + " → " + js.getSkills()));
+
+```
